@@ -39,79 +39,64 @@ public class MensajeController {
 
 	@GetMapping("/chat")
 	public String showChat(Model model, HttpSession session,
-			// Hace opcional este parametro
-			@RequestParam(value = "codChat", required = false, defaultValue = "0") Integer codChat) {
-		List<PrioridadEntity> lstPrioridad = prioridadRepository.findAll();
-		model.addAttribute("lstPrioridad", lstPrioridad);
-		model.addAttribute("chatEntity", new ChatEntity());
-		model.addAttribute("mensaje", new MensajeEntity());
+	        @RequestParam(value = "codChat", required = false, defaultValue = "0") Integer codChat) {
 
-		Integer codPrioridad = (Integer) session.getAttribute("codPrioridad");
-//		System.out.println("Desde get showChat " + codPrioridad);
+	    CuentaEntity usuario = (CuentaEntity) session.getAttribute("usuario");
 
-		if (codPrioridad == null) {
-			List<ChatEntity> lstChat = chatRepository.findAll();
-			model.addAttribute("lstChat", lstChat);
-//			System.out.println(lstChat.get(0).getPrioridad().getNombre());
-		}
+	    if (usuario == null) {
+	        return "redirect:/login";
+	    }
 
-//		List<MensajeEntity> lstMensajes= mensajeRepository.findAll();
-//		
-//		System.out.println(lstMensajes.get(0).getChat().getCodChat());
+	    // Datos de sesión
+	    model.addAttribute("sessionUsuario", usuario);
+	    model.addAttribute("sessionCodUsu", usuario.getCodUsuario());
 
-		if (codChat != 0) {
-		    List<MensajeEntity> mensajesPorFiltro = mensajeRepository.findAllByChat_CodChat(codChat);
-		    model.addAttribute("lstMensajes", mensajesPorFiltro);
-		    model.addAttribute("codChat", codChat);
+	    // Datos comunes
+	    model.addAttribute("chatEntity", new ChatEntity());
+	    model.addAttribute("mensaje", new MensajeEntity());
+	    List<PrioridadEntity> lstPrioridad = prioridadRepository.findAll();
+	    model.addAttribute("lstPrioridad", lstPrioridad);
 
-		    if (!mensajesPorFiltro.isEmpty()) {
-		        int ULTIMO = mensajesPorFiltro.size() - 1;
-		        MensajeEntity mensajePrimero = mensajesPorFiltro.get(ULTIMO);
+	    // Cargar chats según el tipo de usuario
+	    List<ChatEntity> lstChat;
+	    Integer codPrioridad = (Integer) session.getAttribute("codPrioridad");
 
-//		        System.out.println("********************************");
-//		        System.out.println("Desde el get: " + mensajesPorFiltro.get(0).toString());
-//		        System.out.println("Desde el get: " + mensajesPorFiltro.get(0).getChat().getCodChat());
+	    String tipoUsuario = usuario.getTipo().getNomTipo().toLowerCase();
+	    System.out.println("Tipo de usuario logueado: " + tipoUsuario);
+	    if ("asesor(a)".equals(tipoUsuario)) {
+	        lstChat = (codPrioridad != null)
+	                ? chatRepository.findAllByPrioridad_CodPrioridad(codPrioridad)
+	                : chatRepository.findAll();
+	    } else if ("estudiante".equals(tipoUsuario)) {
+	        lstChat = chatRepository.findAllByCuenta_CodUsuario(usuario.getCodUsuario());
+	    } else {
+	        model.addAttribute("loginInvalido", "Tipo de usuario no reconocido");
+	        return "views/login";
+	    }
 
-		        model.addAttribute("mensaje", mensajePrimero);
-		        
-//		        System.out.println("DESDE EL GET***************************");
-//		        System.out.println(mensajePrimero.toString());
-		    } else {
-		        // Si la lista está vacía, crea un mensaje vacío
-		        Optional<ChatEntity> chatBuscadoPorId = chatRepository.findById(codChat);
-		        MensajeEntity nuevoMensaje = new MensajeEntity();
-		        
-		        
-		        nuevoMensaje.setChat(chatBuscadoPorId.orElse(null)); // Asigna el chat encontrado o null
-		        CuentaEntity usuario = (CuentaEntity)session.getAttribute("usuario");
-		        nuevoMensaje.setCuenta(usuario);
-		        model.addAttribute("mensaje", nuevoMensaje);
-//		        System.out.println("DESDE EL GET***************************");
-//		        System.out.println(nuevoMensaje.toString());
-		    }
-		}
-		
-		if (codPrioridad != null) {
-			
-			List<ChatEntity> lstChat = chatRepository.findAllByPrioridad_CodPrioridad(codPrioridad);
-//			System.out.println("Desde el momento en que codPrioridad no es NULL "+lstChat.get(0).getPrioridad().getCodPrioridad());
-			model.addAttribute("lstChat", lstChat);
-		}
+	    model.addAttribute("lstChat", lstChat);
 
-		
-		CuentaEntity usuario = (CuentaEntity) session.getAttribute("usuario");
-//		System.out.println("DEsde el get");
-//		System.out.println(usuario.toString());
-//		
+	    // Si se seleccionó un chat específico, mostrar sus mensajes
+	    if (codChat != 0) {
+	        List<MensajeEntity> mensajes = mensajeRepository.findAllByChat_CodChat(codChat);
+	        model.addAttribute("lstMensajes", mensajes);
+	        model.addAttribute("codChat", codChat);
 
-		if (usuario != null) {
-			model.addAttribute("sessionUsuario", usuario);
-			model.addAttribute("sessionCodUsu", usuario.getCodUsuario());
+	        if (!mensajes.isEmpty()) {
+	            MensajeEntity ultimoMensaje = mensajes.get(mensajes.size() - 1);
+	            model.addAttribute("mensaje", ultimoMensaje);
+	        } else {
+	            Optional<ChatEntity> chatOptional = chatRepository.findById(codChat);
+	            MensajeEntity nuevoMensaje = new MensajeEntity();
+	            nuevoMensaje.setChat(chatOptional.orElse(null));
+	            nuevoMensaje.setCuenta(usuario);
+	            model.addAttribute("mensaje", nuevoMensaje);
+	        }
+	    }
 
-//			System.out.println(usuario.getTipo().getCodTipo());
-		}
-		return "views/chat";
+	    return "views/chat";
 	}
+
 
 	@PostMapping("/filtrar_chat")
 	public String filtrarChat(@ModelAttribute("chatEntity") ChatEntity chatEntity, HttpSession session) {
@@ -125,11 +110,6 @@ public class MensajeController {
 	@PostMapping("/registrar_mensaje")
     public String registrarMensaje (Model model, HttpSession session, @ModelAttribute("mensaje") MensajeEntity mensaje,
     		@RequestParam("contenido")String contenido){
-					
-
-//		System.out.println("CODMENSAJE:"+mensaje.getChat().getCodChat());
-		
-		
 		
 		int codChat = mensaje.getChat().getCodChat();
 		mensaje.setFecMensaje(LocalDateTime.now());
@@ -140,22 +120,12 @@ public class MensajeController {
 		}
 		mensaje.setContenido(contenido);
 		
-//		System.out.println("*******************************************");
-//		System.out.println("DESDE EL POST");
-//		System.out.println(mensaje.toString());
-//		
-//		System.out.println("*******************************************");
-		
         CuentaEntity cuentaEncontrada = (CuentaEntity) session.getAttribute("usuario");
         
         System.out.println(mensaje.toString());
-        if(cuentaEncontrada !=null) {
-//        	System.out.println("DEsde el post");
-//        	System.out.println(cuentaEncontrada.toString());
-//        	System.out.println("*******************************************");        
+        if(cuentaEncontrada !=null) {       
         }
-//        MensajeEntity nuevomensaje = new MensajeEntity();                    
-//        
+                  
         mensaje.setCuenta(cuentaEncontrada);
                                                
         mensajeRepository.save(mensaje);

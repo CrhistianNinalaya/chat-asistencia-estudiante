@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 
 import com.example.demo.entity.ChatEntity;
 
-
 @Repository
 public interface ChatRepository extends JpaRepository<ChatEntity, Integer>{
 	List<ChatEntity> findAllByPrioridad_CodPrioridad(Integer codPrioridad);
+	List<ChatEntity> findAllByCuenta_CodUsuario(Integer codUsuario);
 }
