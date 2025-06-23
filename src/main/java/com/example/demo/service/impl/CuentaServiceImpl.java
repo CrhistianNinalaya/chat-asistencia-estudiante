@@ -2,6 +2,7 @@ package com.example.demo.service.impl;
 
 import javax.servlet.http.HttpSession;
 
+import com.example.demo.entity.DTO.LoginRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +17,8 @@ public class CuentaServiceImpl implements CuentaService {
 	private CuentaRepository cuentaRepository;
 
 	@Override
-	public boolean validarUsuario(CuentaEntity cuentaEntity, HttpSession session) {
-		CuentaEntity cuentaEncontradaPorCorreo = cuentaRepository.findByCorreo(cuentaEntity.getCorreo());
+	public boolean validarUsuario(LoginRequest loginRequest) {
+		CuentaEntity cuentaEncontradaPorCorreo = cuentaRepository.findByCorreo(loginRequest.getCorreo());
 		
 		// ¿El correo existe?
 		if (cuentaEncontradaPorCorreo == null) {
@@ -26,13 +27,7 @@ public class CuentaServiceImpl implements CuentaService {
 
 		// Validar si la contraseña ingresada coincide con la contraseña de la base de
 		// datos
-		if (cuentaEntity.getPassword().equals(cuentaEncontradaPorCorreo.getPassword())) {
-			session.setAttribute("usuario", cuentaEncontradaPorCorreo.getCorreo());			
-			return true;
-		}
-		else {
-			return false;
-		}
+        return loginRequest.getPassword().equals(cuentaEncontradaPorCorreo.getPassword());
 	}
 
 	@Override
