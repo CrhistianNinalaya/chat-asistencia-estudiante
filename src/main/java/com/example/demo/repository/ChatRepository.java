@@ -9,6 +9,5 @@ import com.example.demo.entity.ChatEntity;
 
 @Repository
 public interface ChatRepository extends JpaRepository<ChatEntity, Integer>{
-	List<ChatEntity> findAllByPrioridad_CodPrioridad(Integer codPrioridad);
-	List<ChatEntity> findAllByCuenta_CodUsuario(Integer codUsuario);
+	List<ChatEntity> findByPrioridadCodPrioridad(Integer codPrioridad);
 }
