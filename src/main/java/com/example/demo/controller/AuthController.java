@@ -1,6 +1,9 @@
 package com.example.demo.controller;
-import com.example.demo.entity.DTO.LoginRequest;
+
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
@@ -13,15 +16,24 @@ import com.example.demo.service.CuentaService;
 public class AuthController {
 
 	@Autowired
-	private CuentaService cuentaService;
-	
-	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-		boolean usuarioValido = cuentaService.validarUsuario(loginRequest);
-		if(usuarioValido) {
-			CuentaEntity cuentaLogeada = cuentaService.buscarUsuarioPorCorreo(loginRequest.getCorreo());
-			return ResponseEntity.ok(cuentaLogeada);
-		}
-		return ResponseEntity.badRequest().body("Credenciales inválidas");
-	}
+    private CuentaService cuentaService;
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody CuentaEntity cuenta, HttpSession session) {
+        boolean ok = cuentaService.validarUsuario(cuenta, session);
+        if (!ok) {
+            return ResponseEntity
+                     .status(HttpStatus.UNAUTHORIZED)
+                     .body("Credenciales inválidas");
+        }
+        CuentaEntity u = cuentaService.buscarUsuarioPorCorreo(cuenta.getCorreo());
+        session.setAttribute("usuario", u);
+        return ResponseEntity.ok(u);
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout(HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.ok().build();
+    }
 }

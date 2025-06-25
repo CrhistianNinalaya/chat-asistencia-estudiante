@@ -10,11 +10,26 @@ import java.util.List;
 
 @Service
 public class ChatServiceImpl implements ChatService {
-    @Autowired
+	@Autowired
     private ChatRepository chatRepository;
 
     @Override
-    public List<ChatEntity> findByPrioridadCodPrioridad(Integer codPrioridad) {
-        return chatRepository.findByPrioridadCodPrioridad(codPrioridad);
+    public List<ChatEntity> findAll() {
+        return chatRepository.findAll();
     }
+
+    @Override
+    public List<ChatEntity> findByPrioridad(Integer codPrioridad) {
+        return chatRepository.findAllByPrioridad_CodPrioridad(codPrioridad);
+    }
+
+    @Override
+    public ChatEntity save(ChatEntity chat) {
+        return chatRepository.save(chat);
+    }
+
+	@Override
+	public List<ChatEntity> findByUsuario(Integer codUsuario) {
+		return chatRepository.findAllByCuenta_CodUsuario(codUsuario);
+	}
 }
