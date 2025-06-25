@@ -9,5 +9,4 @@ public class ProyEfsrtiiiApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ProyEfsrtiiiApplication.class, args);
 	}
-
 }

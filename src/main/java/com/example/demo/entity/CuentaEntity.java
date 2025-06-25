@@ -94,7 +94,4 @@ public class CuentaEntity {
 		return "CuentaEntity [codUsuario=" + codUsuario + ", nombre=" + nombre + ", apeUsuario=" + apeUsuario
 				+ ", password=" + password + ", correo=" + correo + ", tipo=" + tipo + "]";
 	}
-
-	
-	
 }

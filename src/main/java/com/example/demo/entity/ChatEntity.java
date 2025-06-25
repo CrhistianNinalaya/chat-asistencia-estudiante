@@ -131,5 +131,4 @@ public class ChatEntity {
 				+ fecCierre + ", estado=" + estado + ", cuenta=" + cuenta + ", categoria=" + categoria + ", prioridad="
 				+ prioridad + "]";
 	}
-	
 }

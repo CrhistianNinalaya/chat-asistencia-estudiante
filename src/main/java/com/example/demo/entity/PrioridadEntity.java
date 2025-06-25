@@ -55,6 +55,4 @@ public class PrioridadEntity implements Serializable {
 	public String toString() {
 		return "PrioridadEntity [codPrioridad=" + codPrioridad + ", nombre=" + nombre + "]";
 	}
-
-	
 }

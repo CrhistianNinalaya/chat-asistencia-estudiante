@@ -51,6 +51,4 @@ public class TipoCuentaEntity{
 	public String toString() {
 		return "TipoCuentaEntity [codTipo=" + codTipo + ", nomTipo=" + nomTipo + "]";
 	}
-
-	
 }

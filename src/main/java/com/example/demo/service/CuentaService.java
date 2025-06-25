@@ -6,6 +6,5 @@ import com.example.demo.entity.CuentaEntity;
 
 public interface CuentaService {
 	boolean validarUsuario(CuentaEntity cuentaEntity, HttpSession session);
-	
 	CuentaEntity buscarUsuarioPorCorreo(String correo);
 }

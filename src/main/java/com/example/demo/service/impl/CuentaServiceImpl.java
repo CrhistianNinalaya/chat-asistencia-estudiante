@@ -19,13 +19,10 @@ public class CuentaServiceImpl implements CuentaService {
 	public boolean validarUsuario(CuentaEntity cuentaEntity, HttpSession session) {
 		CuentaEntity cuentaEncontradaPorCorreo = cuentaRepository.findByCorreo(cuentaEntity.getCorreo());
 		
-		// ¿El correo existe?
 		if (cuentaEncontradaPorCorreo == null) {
 			return false;
 		}
 
-		// Validar si la contraseña ingresada coincide con la contraseña de la base de
-		// datos
 		if (cuentaEntity.getPassword().equals(cuentaEncontradaPorCorreo.getPassword())) {
 			session.setAttribute("usuario", cuentaEncontradaPorCorreo.getCorreo());			
 			return true;
@@ -37,8 +34,6 @@ public class CuentaServiceImpl implements CuentaService {
 
 	@Override
 	public CuentaEntity buscarUsuarioPorCorreo(String correo) {
-		// TODO Auto-generated method stub
 		return cuentaRepository.findByCorreo(correo);
 	}
-
 }

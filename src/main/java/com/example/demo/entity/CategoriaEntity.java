@@ -50,6 +50,4 @@ public class CategoriaEntity{
 	public String toString() {
 		return "CategoriaEntity [codCateogira=" + codCateogira + ", nombre=" + nombre + "]";
 	}
-
-	
 }

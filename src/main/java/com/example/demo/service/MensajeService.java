@@ -6,4 +6,5 @@ import com.example.demo.entity.MensajeEntity;
 
 public interface MensajeService {
     List<MensajeEntity> obtenerMensajesPorCodChat(Integer codChat);
+    MensajeEntity save(MensajeEntity mensaje);
 }

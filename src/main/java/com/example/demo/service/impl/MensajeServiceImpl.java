@@ -17,9 +17,11 @@ public class MensajeServiceImpl implements MensajeService {
 
 	@Override
 	public List<MensajeEntity> obtenerMensajesPorCodChat(Integer codChat) {
-
 		return mensajeRepository.findAllByChat_CodChat(codChat);
-
 	}
 
+	@Override
+	public MensajeEntity save(MensajeEntity mensaje) {
+		return mensajeRepository.save(mensaje);
+	}
 }

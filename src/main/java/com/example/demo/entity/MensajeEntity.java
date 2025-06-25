@@ -97,7 +97,4 @@ public class MensajeEntity {
 		return "MensajeEntity [codMensaje=" + codMensaje + ", contenido=" + contenido + ", fecMensaje=" + fecMensaje
 				+ ", chat=" + chat + ", cuenta=" + cuenta + "]";
 	}
-	
-	
-
 }
