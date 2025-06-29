@@ -8,6 +8,7 @@ import javax.servlet.http.HttpSession;
 
 import com.example.demo.service.MensajeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.entity.ChatEntity;
@@ -17,8 +18,14 @@ import com.example.demo.entity.MensajeEntity;
 @RestController
 @RequestMapping("/api/chats/{codChat}/mensajes")
 public class MensajeController {
-	@Autowired
-    private MensajeService mensajeService;
+
+    private final MensajeService mensajeService;
+    private final SimpMessagingTemplate messagingTemplate;
+
+    public MensajeController(MensajeService mensajeService, SimpMessagingTemplate messagingTemplate) {
+        this.mensajeService = mensajeService;
+        this.messagingTemplate = messagingTemplate;
+    }
 
     @GetMapping
     public List<MensajeEntity> getByChat(@PathVariable Integer codChat) {
@@ -35,6 +42,10 @@ public class MensajeController {
         msg.setFecMensaje(LocalDateTime.now());
         CuentaEntity u = (CuentaEntity) session.getAttribute("usuario");
         msg.setCuenta(u);
-        return mensajeService.save(msg);
+        MensajeEntity savedMsg = mensajeService.save(msg);
+
+        messagingTemplate.convertAndSend("/topic/chat/" + codChat, savedMsg);
+
+        return savedMsg;
     }
 }
