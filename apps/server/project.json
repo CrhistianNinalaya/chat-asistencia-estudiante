@@ -8,21 +8,24 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "./mvnw spring-boot:run",
-        "cwd": "apps/server"
+        "cwd": "apps/server",
+        "envFile": ".env"
       }
     },
     "build": {
       "executor": "nx:run-commands",
       "options": {
         "command": "./mvnw clean package -DskipTests",
-        "cwd": "apps/server"
+        "cwd": "apps/server",
+        "envFile": ".env"
       }
     },
     "test": {
       "executor": "nx:run-commands",
       "options": {
         "command": "./mvnw test",
-        "cwd": "apps/server"
+        "cwd": "apps/server",
+        "envFile": ".env"
       }
     }
   }
