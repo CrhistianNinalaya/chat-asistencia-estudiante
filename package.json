@@ -1,0 +1,22 @@
+{
+  "name": "chat-asistencia-estudiante",
+  "version": "1.0.0",
+  "description": "Student Support Chat - Fullstack Monorepo",
+  "scripts": {
+    "dev:server": "nx serve server",
+    "build:server": "nx build server",
+    "test:server": "nx test server",
+    "server:dev": "nx serve server",
+    "server:build": "nx build server",
+    "server:test": "nx test server"
+  },
+  "keywords": [],
+  "author": "Crhistian Ninalaya",
+  "license": "ISC",
+  "packageManager": "pnpm@10.25.0",
+  "devDependencies": {
+    "@nx/react": "^23.2.1",
+    "@nx/vite": "^23.2.1",
+    "nx": "23.2.1"
+  }
+}
