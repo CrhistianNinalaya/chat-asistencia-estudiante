@@ -4,7 +4,7 @@ package com.example.demo.controller;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import com.example.demo.service.MensajeService;
 import org.springframework.beans.factory.annotation.Autowired;

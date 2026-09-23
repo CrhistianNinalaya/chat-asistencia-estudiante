@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import com.example.demo.entity.CuentaEntity;
 
 public interface CuentaService {
