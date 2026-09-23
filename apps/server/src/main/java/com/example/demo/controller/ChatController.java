@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
+import com.example.demo.entity.AccountEntity;
 import com.example.demo.entity.ChatEntity;
-import com.example.demo.entity.CuentaEntity;
 import com.example.demo.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,28 +20,29 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/api/chats")
 public class ChatController {
 
-	@Autowired
+    @Autowired
     private ChatService chatService;
 
- @GetMapping
+    @GetMapping
     public List<ChatEntity> listAll(
-            @RequestParam(value="priority", required=false) Integer codPrioridad,
+            @RequestParam(value = "priority", required = false) Integer priorityId,
             HttpSession session) {
 
-        CuentaEntity u = (CuentaEntity) session.getAttribute("usuario");
-        boolean isAdvisor = u.getTipo().getCodTipo() == 1;
+        AccountEntity u = (AccountEntity) session.getAttribute("user");
+        boolean isAdvisor = u != null && u.getAccountType() != null && u.getAccountType().getId() == 1;
 
         if (isAdvisor) {
-            if (codPrioridad != null) {
-                return chatService.findByPrioridad(codPrioridad);
+            if (priorityId != null) {
+                return chatService.findByPriority(priorityId);
             }
             return chatService.findAll();
         }
 
-        List<ChatEntity> userChats = chatService.findByUsuario(u.getCodUsuario());
-        if (codPrioridad != null) {
+        Integer accountId = u != null ? u.getId() : null;
+        List<ChatEntity> userChats = chatService.findByAccount(accountId);
+        if (priorityId != null) {
             return userChats.stream()
-                    .filter(c -> c.getPrioridad().getCodPrioridad().equals(codPrioridad))
+                    .filter(c -> c.getPriority() != null && c.getPriority().getId().equals(priorityId))
                     .collect(Collectors.toList());
         }
         return userChats;

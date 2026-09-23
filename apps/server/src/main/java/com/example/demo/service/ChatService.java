@@ -4,8 +4,8 @@ import com.example.demo.entity.ChatEntity;
 import java.util.List;
 
 public interface ChatService {
-	List<ChatEntity> findAll();
-    List<ChatEntity> findByPrioridad(Integer codPrioridad);
-    List<ChatEntity> findByUsuario(Integer codUsuario);
+    List<ChatEntity> findAll();
+    List<ChatEntity> findByPriority(Integer priorityId);
+    List<ChatEntity> findByAccount(Integer accountId);
     ChatEntity save(ChatEntity chat);
 }

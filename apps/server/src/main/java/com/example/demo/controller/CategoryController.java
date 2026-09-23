@@ -7,17 +7,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.entity.PrioridadEntity;
-import com.example.demo.repository.PrioridadRepository;
+import com.example.demo.entity.CategoryEntity;
+import com.example.demo.repository.CategoryRepository;
 
 @RestController
-@RequestMapping("/api/prioridades")
-public class PrioridadController {
-	@Autowired
-    private PrioridadRepository repo;
-    
+@RequestMapping("/api/categories")
+public class CategoryController {
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @GetMapping
-    public List<PrioridadEntity> listAll() {
-        return repo.findAll();
+    public List<CategoryEntity> listAll() {
+        return categoryRepository.findAll();
     }
 }

@@ -11,122 +11,122 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tb_chat")
+@Table(name = "chats")
 public class ChatEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "cod_chat", nullable = false, unique = true)
-	private Integer codChat;
-	
-	@Column(name="asunto", nullable = false)
-	private String asunto;
+	@Column(name = "id", nullable = false, unique = true)
+	private Integer id;
 
-	@Column(name = "fec_inicio", nullable = false, columnDefinition = "DATE")
-	private LocalDate fecInicio;
+	@Column(name = "subject", nullable = false)
+	private String subject;
 
-	@Column(name = "fec_cierre", nullable = false, columnDefinition = "DATE")
-	private LocalDate fecCierre;
+	@Column(name = "start_date", nullable = false, columnDefinition = "DATE")
+	private LocalDate startDate;
 
-	@Column(name = "estado", nullable = false)
-	private boolean estado;
+	@Column(name = "closed_date", nullable = false, columnDefinition = "DATE")
+	private LocalDate closedDate;
 
-	@ManyToOne
-	@JoinColumn(name = "cod_usuario", nullable = false)
-	private CuentaEntity cuenta;
+	@Column(name = "active", nullable = false)
+	private boolean active;
 
 	@ManyToOne
-	@JoinColumn(name = "cod_cat", nullable = false)
-	private CategoriaEntity categoria;
+	@JoinColumn(name = "account_id", nullable = false)
+	private AccountEntity account;
 
 	@ManyToOne
-	@JoinColumn(name = "cod_prioridad", nullable = false)
-	private PrioridadEntity prioridad;
+	@JoinColumn(name = "category_id", nullable = false)
+	private CategoryEntity category;
 
-	public Integer getCodChat() {
-		return codChat;
+	@ManyToOne
+	@JoinColumn(name = "priority_id", nullable = false)
+	private PriorityEntity priority;
+
+	public Integer getId() {
+		return id;
 	}
 
-	public void setCodChat(Integer codChat) {
-		this.codChat = codChat;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
-	public String getAsunto() {
-		return asunto;
+	public String getSubject() {
+		return subject;
 	}
 
-	public void setAsunto(String asunto) {
-		this.asunto = asunto;
+	public void setSubject(String subject) {
+		this.subject = subject;
 	}
 
-	public LocalDate getFecInicio() {
-		return fecInicio;
+	public LocalDate getStartDate() {
+		return startDate;
 	}
 
-	public void setFecInicio(LocalDate fecInicio) {
-		this.fecInicio = fecInicio;
+	public void setStartDate(LocalDate startDate) {
+		this.startDate = startDate;
 	}
 
-	public LocalDate getFecCierre() {
-		return fecCierre;
+	public LocalDate getClosedDate() {
+		return closedDate;
 	}
 
-	public void setFecCierre(LocalDate fecCierre) {
-		this.fecCierre = fecCierre;
+	public void setClosedDate(LocalDate closedDate) {
+		this.closedDate = closedDate;
 	}
 
-	public boolean isEstado() {
-		return estado;
+	public boolean isActive() {
+		return active;
 	}
 
-	public void setEstado(boolean estado) {
-		this.estado = estado;
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
-	public CuentaEntity getCuenta() {
-		return cuenta;
+	public AccountEntity getAccount() {
+		return account;
 	}
 
-	public void setCuenta(CuentaEntity cuenta) {
-		this.cuenta = cuenta;
+	public void setAccount(AccountEntity account) {
+		this.account = account;
 	}
 
-	public CategoriaEntity getCategoria() {
-		return categoria;
+	public CategoryEntity getCategory() {
+		return category;
 	}
 
-	public void setCategoria(CategoriaEntity categoria) {
-		this.categoria = categoria;
+	public void setCategory(CategoryEntity category) {
+		this.category = category;
 	}
 
-	public PrioridadEntity getPrioridad() {
-		return prioridad;
+	public PriorityEntity getPriority() {
+		return priority;
 	}
 
-	public void setPrioridad(PrioridadEntity prioridad) {
-		this.prioridad = prioridad;
+	public void setPriority(PriorityEntity priority) {
+		this.priority = priority;
 	}
 
-	public ChatEntity(Integer codChat, String asunto, LocalDate fecInicio, LocalDate fecCierre, boolean estado,
-			CuentaEntity cuenta, CategoriaEntity categoria, PrioridadEntity prioridad) {
+	public ChatEntity(Integer id, String subject, LocalDate startDate, LocalDate closedDate, boolean active,
+			AccountEntity account, CategoryEntity category, PriorityEntity priority) {
 		super();
-		this.codChat = codChat;
-		this.asunto = asunto;
-		this.fecInicio = fecInicio;
-		this.fecCierre = fecCierre;
-		this.estado = estado;
-		this.cuenta = cuenta;
-		this.categoria = categoria;
-		this.prioridad = prioridad;
+		this.id = id;
+		this.subject = subject;
+		this.startDate = startDate;
+		this.closedDate = closedDate;
+		this.active = active;
+		this.account = account;
+		this.category = category;
+		this.priority = priority;
 	}
 
-	public ChatEntity() {}
+	public ChatEntity() {
+	}
 
 	@Override
 	public String toString() {
-		return "ChatEntity [codChat=" + codChat + ", asunto=" + asunto + ", fecInicio=" + fecInicio + ", fecCierre="
-				+ fecCierre + ", estado=" + estado + ", cuenta=" + cuenta + ", categoria=" + categoria + ", prioridad="
-				+ prioridad + "]";
+		return "ChatEntity [id=" + id + ", subject=" + subject + ", startDate=" + startDate + ", closedDate="
+				+ closedDate + ", active=" + active + ", account=" + account + ", category=" + category
+				+ ", priority=" + priority + "]";
 	}
-	
 }

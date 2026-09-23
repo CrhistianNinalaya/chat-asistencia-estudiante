@@ -10,7 +10,8 @@ import java.util.List;
 
 @Service
 public class ChatServiceImpl implements ChatService {
-	@Autowired
+
+    @Autowired
     private ChatRepository chatRepository;
 
     @Override
@@ -19,8 +20,8 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<ChatEntity> findByPrioridad(Integer codPrioridad) {
-        return chatRepository.findAllByPrioridad_CodPrioridad(codPrioridad);
+    public List<ChatEntity> findByPriority(Integer priorityId) {
+        return chatRepository.findAllByPriority_Id(priorityId);
     }
 
     @Override
@@ -28,8 +29,8 @@ public class ChatServiceImpl implements ChatService {
         return chatRepository.save(chat);
     }
 
-	@Override
-	public List<ChatEntity> findByUsuario(Integer codUsuario) {
-		return chatRepository.findAllByCuenta_CodUsuario(codUsuario);
-	}
+    @Override
+    public List<ChatEntity> findByAccount(Integer accountId) {
+        return chatRepository.findAllByAccount_Id(accountId);
+    }
 }
