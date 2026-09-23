@@ -33,6 +33,10 @@ public class PrioridadEntity implements Serializable {
 	@Column(name = "nombre", nullable = false, columnDefinition = "VARCHAR(25)", unique = true)
 	private String nombre;
 
+	
+	transient String oculto = "Gson";
+	
+	
 	public Integer getCodPrioridad() {
 		return codPrioridad;
 	}
