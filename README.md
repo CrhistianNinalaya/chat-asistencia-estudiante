@@ -4,12 +4,12 @@
 [![React](https://img.shields.io/badge/React-SPA-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![CSS Modules](https://img.shields.io/badge/CSS-Modules-000000?style=for-the-badge&logo=css3&logoColor=white)](https://github.com/css-modules/css-modules)
 [![Java](https://img.shields.io/badge/Java-25%20LTS-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.1-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![WebSocket](https://img.shields.io/badge/WebSocket-STOMP-010101?style=for-the-badge&logo=socketdotio&logoColor=white)](https://spring.io/guides/gs/messaging-stomp-websocket/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
-Plataforma fullstack de atención, asesoría y soporte estudiantil en tiempo real organizada bajo una arquitectura **Monorepo gestionada con Nx**. Integra un cliente frontend en **React (Vite + TypeScript + CSS Modules nativo)** bajo estándares estrictos de Clean Code y desacoplamiento, y un backend en **Spring Boot 3 + Java 25 LTS** con APIs RESTful y mensajería bidireccional vía **WebSockets (STOMP)**.
+Plataforma fullstack de atención, asesoría y soporte estudiantil en tiempo real organizada bajo una arquitectura **Monorepo gestionada con Nx**. Integra un cliente frontend en **React (Vite + TypeScript + CSS Modules nativo)** bajo estándares estrictos de Clean Code y desacoplamiento, y un backend en **Spring Boot 4.1.1 + Java 25 LTS** con APIs RESTful y mensajería bidireccional vía **WebSockets (STOMP)**.
 
 ---
 
@@ -21,7 +21,7 @@ El repositorio se estructura en un único espacio de trabajo multi-proyecto:
 chat-asistencia-estudiante/
 ├── apps/
 │   ├── client/                  # Frontend: SPA React (Vite + CSS Modules + STOMP) -> Deploy en Vercel
-│   └── server/                  # Backend: Spring Boot 3 + Java 25 LTS REST API & WebSocket Broker
+│   └── server/                  # Backend: Spring Boot 4.1.1 + Java 25 LTS REST API & WebSocket Broker
 ├── nx.json                      # Configuración de orquestación y cache de Nx
 ├── package.json                 # Gestión de dependencias y scripts globales
 └── pnpm-workspace.yaml          # Configuración de workspaces de pnpm
@@ -37,7 +37,7 @@ flowchart TD
             WSClient[STOMP WebSocket Client]
         end
 
-        subgraph ServerApp["apps/server (Spring Boot 3 + Java 25 LTS)"]
+        subgraph ServerApp["apps/server (Spring Boot 4.1.1 + Java 25 LTS)"]
             CORS[Filtro CORS] --> REST[REST Controllers]
             REST --> Service[Service Layer]
             
@@ -118,7 +118,7 @@ components/
 
 ### Backend (`apps/server`)
 - **Lenguaje:** Java 25 LTS (Virtual Threads habilitados)
-- **Framework:** Spring Boot 3.x
+- **Framework:** Spring Boot 4.1.1
   - `spring-boot-starter-web` (APIs RESTful)
   - `spring-boot-starter-data-jpa` (Persistencia ORM Jakarta EE)
   - `spring-boot-starter-websocket` (Mensajería STOMP en tiempo real)
@@ -209,7 +209,7 @@ cd apps/server
 - [x] Migración de arquitectura Monolito a REST API.
 - [x] Integración de mensajería en tiempo real con WebSockets (STOMP).
 - [x] Configuración de espacio de trabajo **Monorepo con Nx**.
-- [x] Actualización de dependencias a **Spring Boot 3 + Jakarta EE + Java 25 LTS**.
+- [x] Actualización de dependencias a **Spring Boot 4.1.1 + Jakarta EE + Java 25 LTS**.
 - [x] Refactorización completa de base de datos y backend al inglés.
 - [ ] Creación de aplicación **React en `apps/client`** (Vite + CSS Modules nativo + STOMP client + Vitest).
 - [ ] Implementación de **Spring Security 6 con JWT** para autenticación segura sin estado.
