@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -30,16 +31,15 @@ public class MessageController {
     }
 
     @GetMapping
-    public List<MessageEntity> getByChat(@PathVariable Integer chatId) {
+    public List<MessageEntity> getByChat(@PathVariable UUID chatId) {
         return messageService.getMessagesByChatId(chatId);
     }
 
     @PostMapping
     public MessageEntity post(
-            @PathVariable Integer chatId,
+            @PathVariable UUID chatId,
             @RequestBody MessageEntity msg,
-            HttpSession session
-    ) {
+            HttpSession session) {
         msg.setChat(new ChatEntity(chatId, null, null, null, false, null, null, null));
         msg.setSentAt(LocalDateTime.now());
         AccountEntity u = (AccountEntity) session.getAttribute("user");

@@ -1,23 +1,36 @@
 package com.example.demo.entity;
 
 import java.time.LocalDate;
+import java.util.UUID;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 @Table(name = "chats")
 public class ChatEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id", nullable = false, unique = true)
-	private Integer id;
+	@GeneratedValue
+	@Column(name = "id", updatable = false)
+	private UUID id;
 
 	@Column(name = "subject", nullable = false)
 	private String subject;
@@ -31,102 +44,16 @@ public class ChatEntity {
 	@Column(name = "active", nullable = false)
 	private boolean active;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "account_id", nullable = false)
 	private AccountEntity account;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id", nullable = false)
 	private CategoryEntity category;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "priority_id", nullable = false)
 	private PriorityEntity priority;
 
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getSubject() {
-		return subject;
-	}
-
-	public void setSubject(String subject) {
-		this.subject = subject;
-	}
-
-	public LocalDate getStartDate() {
-		return startDate;
-	}
-
-	public void setStartDate(LocalDate startDate) {
-		this.startDate = startDate;
-	}
-
-	public LocalDate getClosedDate() {
-		return closedDate;
-	}
-
-	public void setClosedDate(LocalDate closedDate) {
-		this.closedDate = closedDate;
-	}
-
-	public boolean isActive() {
-		return active;
-	}
-
-	public void setActive(boolean active) {
-		this.active = active;
-	}
-
-	public AccountEntity getAccount() {
-		return account;
-	}
-
-	public void setAccount(AccountEntity account) {
-		this.account = account;
-	}
-
-	public CategoryEntity getCategory() {
-		return category;
-	}
-
-	public void setCategory(CategoryEntity category) {
-		this.category = category;
-	}
-
-	public PriorityEntity getPriority() {
-		return priority;
-	}
-
-	public void setPriority(PriorityEntity priority) {
-		this.priority = priority;
-	}
-
-	public ChatEntity(Integer id, String subject, LocalDate startDate, LocalDate closedDate, boolean active,
-			AccountEntity account, CategoryEntity category, PriorityEntity priority) {
-		super();
-		this.id = id;
-		this.subject = subject;
-		this.startDate = startDate;
-		this.closedDate = closedDate;
-		this.active = active;
-		this.account = account;
-		this.category = category;
-		this.priority = priority;
-	}
-
-	public ChatEntity() {
-	}
-
-	@Override
-	public String toString() {
-		return "ChatEntity [id=" + id + ", subject=" + subject + ", startDate=" + startDate + ", closedDate="
-				+ closedDate + ", active=" + active + ", account=" + account + ", category=" + category
-				+ ", priority=" + priority + "]";
-	}
 }

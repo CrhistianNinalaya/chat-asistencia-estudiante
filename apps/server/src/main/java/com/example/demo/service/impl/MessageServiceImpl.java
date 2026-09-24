@@ -1,6 +1,8 @@
 package com.example.demo.service.impl;
 
 import java.util.List;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.demo.entity.MessageEntity;
@@ -14,7 +16,7 @@ public class MessageServiceImpl implements MessageService {
     private MessageRepository messageRepository;
 
     @Override
-    public List<MessageEntity> getMessagesByChatId(Integer chatId) {
+    public List<MessageEntity> getMessagesByChatId(UUID chatId) {
         return messageRepository.findAllByChat_Id(chatId);
     }
 

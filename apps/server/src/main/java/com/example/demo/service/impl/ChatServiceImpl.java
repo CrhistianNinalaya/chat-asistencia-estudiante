@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ChatServiceImpl implements ChatService {
@@ -20,7 +21,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<ChatEntity> findByPriority(Integer priorityId) {
+    public List<ChatEntity> findByPriority(UUID priorityId) {
         return chatRepository.findAllByPriority_Id(priorityId);
     }
 
@@ -30,7 +31,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<ChatEntity> findByAccount(Integer accountId) {
+    public List<ChatEntity> findByAccount(UUID accountId) {
         return chatRepository.findAllByAccount_Id(accountId);
     }
 }
