@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,7 +42,7 @@ public class MessageController {
             @RequestBody MessageEntity msg,
             HttpSession session) {
         msg.setChat(new ChatEntity(chatId, null, null, null, false, null, null, null));
-        msg.setSentAt(LocalDateTime.now());
+        msg.setSentAt(LocalDateTime.now(ZoneOffset.UTC));
         AccountEntity u = (AccountEntity) session.getAttribute("user");
         msg.setAccount(u);
         MessageEntity savedMsg = messageService.save(msg);
