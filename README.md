@@ -135,23 +135,17 @@ components/
 | `POST` | `/api/auth/login` | Inicia sesión del usuario | `{ "email": "...", "password": "..." }` |
 | `GET` | `/api/auth/logout` | Cierra la sesión activa | N/A |
 
-### 💬 Chats / Tickets
-| Método | Endpoint | Descripción | Parámetros Query |
+### 💬 Tickets
+| Método | Endpoint | Descripción | Parámetros Query / Body |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/chats` | Lista los chats según rol (asesor/estudiante) | `?priority={id}` (opcional) |
-| `POST` | `/api/chats` | Crea una nueva sala de chat / ticket | Objeto `ChatEntity` |
+| `GET` | `/api/tickets` | Lista tickets según rol (asesor: asignados activos y libres; estudiante: propios) | `?active={true\|false}` (opcional)<br>`?priority={LOW\|MEDIUM\|HIGH}` (opcional SLA) |
+| `POST` | `/api/tickets` | Crea un nuevo ticket de soporte | Objeto `TicketEntity` |
 
 ### ✉️ Mensajes
 | Método | Endpoint | Descripción | Body (JSON) |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/chats/{chatId}/messages` | Historial de mensajes de un chat | N/A |
-| `POST` | `/api/chats/{chatId}/messages` | Registra y emite el mensaje vía WebSocket | `{ "content": "..." }` |
-
-### 🏷️ Prioridades y Categorías
-| Método | Endpoint | Descripción |
-| :--- | :--- | :--- |
-| `GET` | `/api/priorities` | Lista los niveles de prioridad |
-| `GET` | `/api/categories` | Lista las categorías de consultas |
+| `GET` | `/api/tickets/{ticketId}/messages` | Historial de mensajes de un ticket | N/A |
+| `POST` | `/api/tickets/{ticketId}/messages` | Registra y emite el mensaje vía WebSocket | `{ "content": "..." }` |
 
 ---
 

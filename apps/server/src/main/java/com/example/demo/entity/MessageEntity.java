@@ -28,30 +28,30 @@ import lombok.ToString;
 @Table(name = "messages")
 public class MessageEntity {
 
-	@Id
-	@GeneratedValue
-	@Column(name = "id", updatable = false)
-	private UUID id;
+    @Id
+    @GeneratedValue
+    @Column(name = "id", updatable = false)
+    private UUID id;
 
-	@Column(name = "content", nullable = false)
-	private String content;
+    @Column(name = "content", nullable = false)
+    private String content;
 
-	@Column(name = "sent_at", nullable = false, columnDefinition = "DATETIME")
-	private LocalDateTime sentAt;
+    @Column(name = "sent_at", nullable = false, columnDefinition = "DATETIME")
+    private LocalDateTime sentAt;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "chat_id", nullable = false)
-	private ChatEntity chat;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_id", nullable = false)
+    private TicketEntity chat;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "account_id", nullable = false)
-	private AccountEntity account;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false)
+    private AccountEntity account;
 
-	@PrePersist
-	protected void onCreate() {
-		if (this.sentAt == null) {
-			this.sentAt = LocalDateTime.now(ZoneOffset.UTC);
-		}
-	}
+    @PrePersist
+    protected void onCreate() {
+        if (this.sentAt == null) {
+            this.sentAt = LocalDateTime.now(ZoneOffset.UTC);
+        }
+    }
 
 }
