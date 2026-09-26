@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dto.CreateTicketRequest;
-import com.example.demo.dto.TicketResponse;
+import com.example.demo.dto.TicketDto;
 import com.example.demo.security.UserPrincipal;
 import com.example.demo.service.TicketService;
 import com.example.enums.TicketPriority;
@@ -29,7 +28,7 @@ public class TicketController {
     private final TicketService ticketService;
 
     @GetMapping
-    public List<TicketResponse> listAll(
+    public List<TicketDto.Response> listAll(
             @RequestParam(value = "active", required = false) Boolean active,
             @RequestParam(value = "priority", required = false) TicketPriority priority,
             @AuthenticationPrincipal UserPrincipal user) {
@@ -37,10 +36,10 @@ public class TicketController {
     }
 
     @PostMapping
-    public ResponseEntity<TicketResponse> create(
-            @Valid @RequestBody CreateTicketRequest request,
+    public ResponseEntity<TicketDto.Response> create(
+            @Valid @RequestBody TicketDto.CreateRequest request,
             @AuthenticationPrincipal UserPrincipal user) {
-        TicketResponse response = ticketService.createTicket(request, user);
+        TicketDto.Response response = ticketService.createTicket(request, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

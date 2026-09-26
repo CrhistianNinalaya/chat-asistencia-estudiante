@@ -10,8 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.demo.dto.CreateTicketRequest;
-import com.example.demo.dto.TicketResponse;
+import com.example.demo.dto.TicketDto;
 import com.example.demo.entity.StudentEntity;
 import com.example.demo.entity.TicketEntity;
 import com.example.demo.repository.TicketRepository;
@@ -29,7 +28,7 @@ public class TicketServiceImpl implements TicketService {
     private final TicketRepository ticketRepository;
 
     @Override
-    public List<TicketResponse> listTickets(Boolean active, TicketPriority priority, UserPrincipal user) {
+    public List<TicketDto.Response> listTickets(Boolean active, TicketPriority priority, UserPrincipal user) {
         if (user == null) {
             return Collections.emptyList();
         }
@@ -46,12 +45,12 @@ public class TicketServiceImpl implements TicketService {
         }
 
         return entities.stream()
-                .map(TicketResponse::fromEntity)
+                .map(TicketDto.Response::fromEntity)
                 .toList();
     }
 
     @Override
-    public TicketResponse createTicket(CreateTicketRequest request, UserPrincipal user) {
+    public TicketDto.Response createTicket(TicketDto.CreateRequest request, UserPrincipal user) {
         if (user == null || user.getAccountType() != AccountType.STUDENT) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only students can create tickets");
         }
@@ -71,7 +70,7 @@ public class TicketServiceImpl implements TicketService {
         ticket.setGeneratedBy(student);
 
         TicketEntity saved = ticketRepository.save(ticket);
-        return TicketResponse.fromEntity(saved);
+        return TicketDto.Response.fromEntity(saved);
     }
 
     private List<TicketEntity> listTicketsForAdvisor(

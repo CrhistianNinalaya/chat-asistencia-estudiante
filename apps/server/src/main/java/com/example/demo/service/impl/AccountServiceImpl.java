@@ -6,9 +6,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.dto.AccountResponse;
-import com.example.demo.dto.AuthResponse;
-import com.example.demo.dto.LoginRequest;
+import com.example.demo.dto.AuthDto;
 import com.example.demo.entity.AccountEntity;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.security.JwtService;
@@ -26,7 +24,7 @@ public class AccountServiceImpl implements AccountService {
     private final JwtService jwtService;
 
     @Override
-    public AuthResponse authenticate(LoginRequest request) {
+    public AuthDto.Response authenticate(AuthDto.LoginRequest request) {
         AccountEntity account = accountRepository.findByEmail(request.email())
                 .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
@@ -36,9 +34,9 @@ public class AccountServiceImpl implements AccountService {
 
         UserPrincipal principal = UserPrincipal.fromEntity(account);
         String token = jwtService.generateToken(principal);
-        AccountResponse accountResponse = AccountResponse.fromEntity(account);
+        AuthDto.AccountResponse accountResponse = AuthDto.AccountResponse.fromEntity(account);
 
-        return new AuthResponse(token, accountResponse);
+        return new AuthDto.Response(token, accountResponse);
     }
 
     @Override
