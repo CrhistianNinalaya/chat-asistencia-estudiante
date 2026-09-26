@@ -139,7 +139,7 @@ components/
 | Método | Endpoint | Descripción | Parámetros Query / Body |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/tickets` | Lista tickets según rol (asesor: asignados activos y libres; estudiante: propios) | `?active={true\|false}` (opcional)<br>`?priority={LOW\|MEDIUM\|HIGH}` (opcional SLA) |
-| `POST` | `/api/tickets` | Crea un nuevo ticket de soporte | Objeto `TicketEntity` |
+| `POST` | `/api/tickets` | Crea un nuevo ticket de soporte | `{ "title": "...", "description": "...", "category": "GENERAL\|TECHNICAL\|BILLING\|FEEDBACK" }` |
 
 ### ✉️ Mensajes
 | Método | Endpoint | Descripción | Body (JSON) |

@@ -6,8 +6,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.example.demo.dto.CreateTicketRequest;
+import com.example.demo.dto.TicketResponse;
+import com.example.demo.entity.StudentEntity;
 import com.example.demo.entity.TicketEntity;
 import com.example.demo.repository.TicketRepository;
 import com.example.demo.security.UserPrincipal;
@@ -24,7 +29,7 @@ public class TicketServiceImpl implements TicketService {
     private final TicketRepository ticketRepository;
 
     @Override
-    public List<TicketEntity> listTickets(Boolean active, TicketPriority priority, UserPrincipal user) {
+    public List<TicketResponse> listTickets(Boolean active, TicketPriority priority, UserPrincipal user) {
         if (user == null) {
             return Collections.emptyList();
         }
@@ -33,11 +38,40 @@ public class TicketServiceImpl implements TicketService {
         Instant twoDaysAgo = now.minus(2, ChronoUnit.DAYS);
         Instant fourDaysAgo = now.minus(4, ChronoUnit.DAYS);
 
+        List<TicketEntity> entities;
         if (user.getAccountType() == AccountType.ADVISOR) {
-            return listTicketsForAdvisor(user.getId(), active, priority, twoDaysAgo, fourDaysAgo);
+            entities = listTicketsForAdvisor(user.getId(), active, priority, twoDaysAgo, fourDaysAgo);
+        } else {
+            entities = listTicketsForStudent(user.getId(), active, priority);
         }
 
-        return listTicketsForStudent(user.getId(), active, priority);
+        return entities.stream()
+                .map(TicketResponse::fromEntity)
+                .toList();
+    }
+
+    @Override
+    public TicketResponse createTicket(CreateTicketRequest request, UserPrincipal user) {
+        if (user == null || user.getAccountType() != AccountType.STUDENT) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only students can create tickets");
+        }
+
+        StudentEntity student = new StudentEntity();
+        student.setId(user.getId());
+        student.setFirstName(user.getFirstName());
+        student.setLastName(user.getLastName());
+        student.setEmail(user.getEmail());
+
+        TicketEntity ticket = new TicketEntity();
+        ticket.setTitle(request.title());
+        ticket.setDescription(request.description());
+        ticket.setCategory(request.category());
+        ticket.setActive(true);
+        ticket.setStartedAt(Instant.now());
+        ticket.setGeneratedBy(student);
+
+        TicketEntity saved = ticketRepository.save(ticket);
+        return TicketResponse.fromEntity(saved);
     }
 
     private List<TicketEntity> listTicketsForAdvisor(
