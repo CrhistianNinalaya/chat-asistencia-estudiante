@@ -37,11 +37,11 @@ public class TicketServiceImpl implements TicketService {
         }
 
         Instant now = Instant.now();
-        Instant twoDaysAgo = now.minus(2, ChronoUnit.DAYS);
-        Instant fourDaysAgo = now.minus(4, ChronoUnit.DAYS);
+        Instant lowPriorityThreshold = now.minus(TicketEntity.LOW_PRIORITY_MAX_DAYS, ChronoUnit.DAYS);
+        Instant mediumPriorityThreshold = now.minus(TicketEntity.MEDIUM_PRIORITY_MAX_DAYS, ChronoUnit.DAYS);
 
         List<TicketEntity> entities = switch (user.getAccountType()) {
-            case ADVISOR -> listTicketsForAdvisor(user.getId(), active, priority, twoDaysAgo, fourDaysAgo);
+            case ADVISOR -> listTicketsForAdvisor(user.getId(), active, priority, lowPriorityThreshold, mediumPriorityThreshold);
             case STUDENT -> listTicketsForStudent(user.getId(), active, priority);
             case ADMIN -> ticketRepository.findAllForAdmin(active, priority);
             case null -> Collections.emptyList();
@@ -74,23 +74,23 @@ public class TicketServiceImpl implements TicketService {
     }
 
     private List<TicketEntity> listTicketsForAdvisor(
-            UUID advisorId, Boolean active, TicketPriority priority, Instant twoDaysAgo, Instant fourDaysAgo) {
+            UUID advisorId, Boolean active, TicketPriority priority, Instant lowPriorityThreshold, Instant mediumPriorityThreshold) {
         boolean isActive = active == null || Boolean.TRUE.equals(active);
         if (isActive) {
-            return listActiveTicketsForAdvisor(advisorId, priority, twoDaysAgo, fourDaysAgo);
+            return listActiveTicketsForAdvisor(advisorId, priority, lowPriorityThreshold, mediumPriorityThreshold);
         }
         return listClosedTicketsForAdvisor(advisorId, priority);
     }
 
     private List<TicketEntity> listActiveTicketsForAdvisor(
-            UUID advisorId, TicketPriority priority, Instant twoDaysAgo, Instant fourDaysAgo) {
+            UUID advisorId, TicketPriority priority, Instant lowPriorityThreshold, Instant mediumPriorityThreshold) {
         if (priority == null) {
             return ticketRepository.findActiveForAdvisor(advisorId);
         }
         return switch (priority) {
-            case LOW -> ticketRepository.findActiveForAdvisorStartedAfter(advisorId, twoDaysAgo);
-            case MEDIUM -> ticketRepository.findActiveForAdvisorStartedBetween(advisorId, twoDaysAgo, fourDaysAgo);
-            case HIGH -> ticketRepository.findActiveForAdvisorStartedBeforeOrEqual(advisorId, fourDaysAgo);
+            case LOW -> ticketRepository.findActiveForAdvisorStartedAfter(advisorId, lowPriorityThreshold);
+            case MEDIUM -> ticketRepository.findActiveForAdvisorStartedBetween(advisorId, lowPriorityThreshold, mediumPriorityThreshold);
+            case HIGH -> ticketRepository.findActiveForAdvisorStartedBeforeOrEqual(advisorId, mediumPriorityThreshold);
         };
     }
 

@@ -20,11 +20,13 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AdvisorEntity extends AccountEntity {
 
+    public static final int DEFAULT_MAX_CONCURRENT_TICKETS = 3;
+
     @Column(name = "employee_code", nullable = false, unique = true, length = 30)
     private String employeeCode;
 
     @Column(name = "max_concurrent_tickets", nullable = false)
-    private Integer maxConcurrentTickets = 3;
+    private Integer maxConcurrentTickets = DEFAULT_MAX_CONCURRENT_TICKETS;
 
     @Column(name = "is_available", nullable = false)
     private Boolean isAvailable = true;

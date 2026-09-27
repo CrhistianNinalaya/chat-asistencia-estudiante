@@ -28,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MessageController {
 
+    public static final String DEFAULT_PAGE_SIZE = "30";
+
     private final MessageService messageService;
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -35,7 +37,7 @@ public class MessageController {
     public MessageDto.PagedResponse getMessagesByTicket(
             @PathVariable UUID ticketId,
             @RequestParam(required = false) Instant before,
-            @RequestParam(defaultValue = "30") int limit,
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int limit,
             @AuthenticationPrincipal UserPrincipal user) {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User must be authenticated");

@@ -65,14 +65,17 @@ public class TicketEntity {
     @Column(name = "category", nullable = false, length = 20)
     private TicketCategory category;
 
+    public static final long LOW_PRIORITY_MAX_DAYS = 2L;
+    public static final long MEDIUM_PRIORITY_MAX_DAYS = 4L;
+
     @Transient
     public TicketPriority getPriority() {
         Instant reference = this.closedAt != null ? this.closedAt : Instant.now();
         Instant start = this.startedAt != null ? this.startedAt : reference;
         long days = Duration.between(start, reference).toDays();
-        if (days < 2) {
+        if (days < LOW_PRIORITY_MAX_DAYS) {
             return TicketPriority.LOW;
-        } else if (days < 4) {
+        } else if (days < MEDIUM_PRIORITY_MAX_DAYS) {
             return TicketPriority.MEDIUM;
         } else {
             return TicketPriority.HIGH;

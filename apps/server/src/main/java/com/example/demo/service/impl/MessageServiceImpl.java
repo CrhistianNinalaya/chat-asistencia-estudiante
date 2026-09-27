@@ -33,6 +33,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
+    public static final int MIN_PAGE_SIZE = 1;
+    public static final int MAX_PAGE_SIZE = 100;
+
     private final MessageRepository messageRepository;
     private final TicketRepository ticketRepository;
     private final AccountRepository accountRepository;
@@ -44,7 +47,7 @@ public class MessageServiceImpl implements MessageService {
 
         validateTicketReadAccess(ticket, user);
 
-        int pageSize = Math.clamp(limit, 1, 100);
+        int pageSize = Math.clamp(limit, MIN_PAGE_SIZE, MAX_PAGE_SIZE);
         Pageable pageable = PageRequest.of(0, pageSize + 1);
 
         List<MessageEntity> entities = before == null
