@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.example.demo.entity.TicketEntity;
+import com.example.demo.enums.TicketPriority;
 
 public interface TicketRepository extends JpaRepository<TicketEntity, UUID> {
 
@@ -99,4 +100,14 @@ public interface TicketRepository extends JpaRepository<TicketEntity, UUID> {
     List<TicketEntity> findAllByStudentAndActive(
             @Param("studentId") UUID studentId,
             @Param("active") boolean active);
+
+    @Query("""
+        SELECT t FROM TicketEntity t
+        WHERE (:active IS NULL OR t.active = :active)
+          AND (:priority IS NULL OR t.priority = :priority)
+        ORDER BY t.startedAt DESC
+    """)
+    List<TicketEntity> findAllForAdmin(
+            @Param("active") Boolean active,
+            @Param("priority") TicketPriority priority);
 }

@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dto.TicketDto;
 import com.example.demo.entity.StudentEntity;
@@ -29,6 +30,7 @@ public class TicketServiceImpl implements TicketService {
     private final EntityManager entityManager;
 
     @Override
+    @Transactional(readOnly = true)
     public List<TicketDto.Response> listTickets(Boolean active, TicketPriority priority, UserPrincipal user) {
         if (user == null) {
             return Collections.emptyList();
@@ -38,12 +40,12 @@ public class TicketServiceImpl implements TicketService {
         Instant twoDaysAgo = now.minus(2, ChronoUnit.DAYS);
         Instant fourDaysAgo = now.minus(4, ChronoUnit.DAYS);
 
-        List<TicketEntity> entities;
-        if (user.getAccountType() == AccountType.ADVISOR) {
-            entities = listTicketsForAdvisor(user.getId(), active, priority, twoDaysAgo, fourDaysAgo);
-        } else {
-            entities = listTicketsForStudent(user.getId(), active, priority);
-        }
+        List<TicketEntity> entities = switch (user.getAccountType()) {
+            case ADVISOR -> listTicketsForAdvisor(user.getId(), active, priority, twoDaysAgo, fourDaysAgo);
+            case STUDENT -> listTicketsForStudent(user.getId(), active, priority);
+            case ADMIN -> ticketRepository.findAllForAdmin(active, priority);
+            case null -> Collections.emptyList();
+        };
 
         return entities.stream()
                 .map(TicketDto.Response::fromEntity)
@@ -51,6 +53,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    @Transactional
     public TicketDto.Response createTicket(TicketDto.CreateRequest request, UserPrincipal user) {
         if (user == null || user.getAccountType() != AccountType.STUDENT) {
             throw new AccessDeniedException("Only students can create tickets");
