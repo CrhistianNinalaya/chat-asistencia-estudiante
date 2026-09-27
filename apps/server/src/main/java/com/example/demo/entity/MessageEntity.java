@@ -1,7 +1,6 @@
 package com.example.demo.entity;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -33,11 +32,11 @@ public class MessageEntity {
     @Column(name = "id", updatable = false)
     private UUID id;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "sent_at", nullable = false, columnDefinition = "DATETIME")
-    private LocalDateTime sentAt;
+    @Column(name = "sent_at", nullable = false, updatable = false)
+    private Instant sentAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id", nullable = false)
@@ -50,7 +49,7 @@ public class MessageEntity {
     @PrePersist
     protected void onCreate() {
         if (this.sentAt == null) {
-            this.sentAt = LocalDateTime.now(ZoneOffset.UTC);
+            this.sentAt = Instant.now();
         }
     }
 

@@ -152,7 +152,7 @@ components/
 ## 🔌 Canales de WebSocket (STOMP)
 
 - **Handshake Endpoint:** `ws://localhost:8080/chat-websocket`
-- **Canal de Suscripción (Topic):** `/topic/chat/{chatId}`  
+- **Canal de Suscripción (Topic):** `/topic/chat/{ticketId}`  
   *(Los clientes suscritos reciben las publicaciones en tiempo real cada vez que un participante envía un mensaje).*
 
 ---

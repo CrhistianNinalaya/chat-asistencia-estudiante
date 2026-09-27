@@ -1,0 +1,53 @@
+package com.example.demo.dto;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
+
+import com.example.demo.entity.AccountEntity;
+import com.example.demo.entity.MessageEntity;
+import com.example.enums.AccountType;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public final class MessageDto {
+
+    private MessageDto() {
+    }
+
+    public record SendRequest(
+            @NotBlank(message = "Message content must not be blank")
+            @Size(max = 2000, message = "Message content must not exceed 2000 characters")
+            String content
+            ) {
+
+    }
+
+    public record Response(
+            UUID id,
+            String content,
+            Instant sentAt,
+            UUID ticketId,
+            UUID senderId,
+            String senderName,
+            AccountType senderRole
+            ) implements Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        public static Response fromEntity(MessageEntity entity) {
+            AccountEntity account = entity.getAccount();
+            String fullName = account.getFirstName() + " " + account.getLastName();
+            return new Response(
+                    entity.getId(),
+                    entity.getContent(),
+                    entity.getSentAt(),
+                    entity.getChat().getId(),
+                    account.getId(),
+                    fullName,
+                    account.getAccountType()
+            );
+        }
+    }
+}

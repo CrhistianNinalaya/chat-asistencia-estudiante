@@ -34,8 +34,8 @@ CREATE TABLE tickets (
 
 CREATE TABLE messages (
     id BINARY(16) NOT NULL PRIMARY KEY,
-    content VARCHAR(255) NOT NULL,
-    sent_at DATETIME NOT NULL,
+    content TEXT NOT NULL,
+    sent_at TIMESTAMP NOT NULL,
     chat_id BINARY(16) NOT NULL,
     account_id BINARY(16) NOT NULL,
     CONSTRAINT fk_msg_chat FOREIGN KEY (chat_id) REFERENCES tickets(id),
