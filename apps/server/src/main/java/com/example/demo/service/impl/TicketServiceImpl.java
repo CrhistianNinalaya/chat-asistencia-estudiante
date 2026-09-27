@@ -117,22 +117,4 @@ public class TicketServiceImpl implements TicketService {
                 .filter(t -> t.getPriority() == priority)
                 .toList();
     }
-
-    @Override
-    public List<TicketEntity> findAll() {
-        return ticketRepository.findAll();
-    }
-
-    @Override
-    public List<TicketEntity> findByAccount(UUID accountId) {
-        if (accountId == null) {
-            return Collections.emptyList();
-        }
-        return ticketRepository.findAllByGeneratedBy_Id(accountId);
-    }
-
-    @Override
-    public TicketEntity save(TicketEntity ticket) {
-        return ticketRepository.save(ticket);
-    }
 }

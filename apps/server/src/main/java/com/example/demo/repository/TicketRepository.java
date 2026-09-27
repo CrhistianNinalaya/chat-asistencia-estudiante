@@ -13,10 +13,6 @@ import com.example.demo.enums.TicketPriority;
 
 public interface TicketRepository extends JpaRepository<TicketEntity, UUID> {
 
-    List<TicketEntity> findAllByGeneratedBy_Id(UUID studentId);
-
-    List<TicketEntity> findAllByAssignedTo_Id(UUID advisorId);
-
     // =========================================================================
     // Advisor Queries
     // =========================================================================
