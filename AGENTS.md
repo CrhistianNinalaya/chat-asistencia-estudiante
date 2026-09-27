@@ -8,6 +8,7 @@ This repository (`chat-asistencia-estudiante`) adheres to strict quality, archit
 
 - **Zero Inline Comments (Production Code):** Absolutely NO inline comments (`// ...` or `/* ... */`) inside method or function bodies in production code. Code must be self-explanatory through expressive naming and clear abstractions.
 - **AAA Testing Comments Exception:** In test files, explicitly delineate the structure of every test using simple section markers where each phase begins: `// Arrange`, `// Act`, and `// Assert` (or `// Act & Assert` for MockMvc chained assertions).
+- **SonarQube S108 Empty Block Comment Exception:** When a block or `switch` branch is intentionally a no-op (e.g., an intentional no-op branch for a role like `ADMIN` requiring no validation), an explanatory English comment is explicitly allowed inside the block to satisfy SonarQube `java:S108` (e.g., `// Intentionally empty: admins have unrestricted read access`).
 - **Strict English Everywhere:** 100% of all code must be written in English. This applies to identifiers, classes, methods, variables, exception types, exception messages, validation constraint messages, logs, tests, and git commit messages.
 - **Self-Documenting Code:** Rely on descriptive domain terminology rather than explanatory comments.
 
@@ -35,7 +36,7 @@ This repository (`chat-asistencia-estudiante`) adheres to strict quality, archit
 ## 4. Modern Java & SonarQube Rules (Java 21 / 25)
 
 - **Rule Switch (`->`):** Use arrow syntax with pattern matching for `switch` expressions and statements.
-- **No Empty Blocks (`java:S108`):** Never leave empty catch or branch blocks.
+- **No Empty Blocks (`java:S108`):** Never leave catch or branch blocks completely empty without explanation. If a branch or catch block is intentionally a no-op, always include an explanatory English comment explaining why no action is needed to satisfy SonarQube.
 - **No Unused Variables (`java:S1481`):** Eliminate unread pattern variables and unused locals.
 - **Immutable DTOs:** Use Java `record` for all DTOs and request/response payloads.
 - **Built-in Clamping:** Use `Math.clamp(value, min, max)` for numerical bounding.
