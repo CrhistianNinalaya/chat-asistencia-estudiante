@@ -2,7 +2,7 @@ package com.example.demo.entity;
 
 import java.util.UUID;
 
-import com.example.enums.AccountType;
+import com.example.demo.enums.AccountType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;

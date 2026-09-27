@@ -5,8 +5,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 import com.example.demo.entity.TicketEntity;
-import com.example.enums.TicketCategory;
-import com.example.enums.TicketPriority;
+import com.example.demo.enums.TicketCategory;
+import com.example.demo.enums.TicketPriority;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

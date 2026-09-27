@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import com.example.demo.entity.AccountEntity;
 import com.example.demo.entity.MessageEntity;
-import com.example.enums.AccountType;
+import com.example.demo.enums.AccountType;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

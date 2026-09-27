@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.TicketDto;
 import com.example.demo.security.UserPrincipal;
 import com.example.demo.service.TicketService;
-import com.example.enums.TicketPriority;
+import com.example.demo.enums.TicketPriority;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

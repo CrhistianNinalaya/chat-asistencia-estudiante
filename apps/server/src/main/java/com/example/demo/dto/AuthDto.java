@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import com.example.demo.entity.AccountEntity;
-import com.example.enums.AccountType;
+import com.example.demo.enums.AccountType;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

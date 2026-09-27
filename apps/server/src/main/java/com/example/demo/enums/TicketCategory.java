@@ -1,4 +1,4 @@
-package com.example.enums;
+package com.example.demo.enums;
 
 public enum TicketCategory {
     GENERAL,

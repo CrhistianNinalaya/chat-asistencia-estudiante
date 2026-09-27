@@ -9,7 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.example.demo.entity.AccountEntity;
-import com.example.enums.AccountType;
+import com.example.demo.enums.AccountType;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -16,8 +16,8 @@ import com.example.demo.entity.TicketEntity;
 import com.example.demo.repository.TicketRepository;
 import com.example.demo.security.UserPrincipal;
 import com.example.demo.service.TicketService;
-import com.example.enums.AccountType;
-import com.example.enums.TicketPriority;
+import com.example.demo.enums.AccountType;
+import com.example.demo.enums.TicketPriority;
 
 import lombok.RequiredArgsConstructor;
 

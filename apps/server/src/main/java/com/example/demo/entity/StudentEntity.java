@@ -1,6 +1,6 @@
 package com.example.demo.entity;
 
-import com.example.enums.AccountType;
+import com.example.demo.enums.AccountType;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;

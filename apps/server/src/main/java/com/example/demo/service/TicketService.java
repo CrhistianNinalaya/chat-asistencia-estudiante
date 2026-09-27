@@ -6,7 +6,7 @@ import java.util.UUID;
 import com.example.demo.dto.TicketDto;
 import com.example.demo.entity.TicketEntity;
 import com.example.demo.security.UserPrincipal;
-import com.example.enums.TicketPriority;
+import com.example.demo.enums.TicketPriority;
 
 public interface TicketService {
 

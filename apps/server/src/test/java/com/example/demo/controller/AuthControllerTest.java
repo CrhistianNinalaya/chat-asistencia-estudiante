@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.example.demo.dto.AuthDto;
 import com.example.demo.exception.GlobalExceptionHandler;
 import com.example.demo.service.AccountService;
-import com.example.enums.AccountType;
+import com.example.demo.enums.AccountType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
