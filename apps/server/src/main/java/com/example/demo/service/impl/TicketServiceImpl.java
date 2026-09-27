@@ -6,9 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.dto.TicketDto;
 import com.example.demo.entity.StudentEntity;
@@ -19,6 +18,7 @@ import com.example.demo.service.TicketService;
 import com.example.demo.enums.AccountType;
 import com.example.demo.enums.TicketPriority;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
+    private final EntityManager entityManager;
 
     @Override
     public List<TicketDto.Response> listTickets(Boolean active, TicketPriority priority, UserPrincipal user) {
@@ -52,14 +53,10 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketDto.Response createTicket(TicketDto.CreateRequest request, UserPrincipal user) {
         if (user == null || user.getAccountType() != AccountType.STUDENT) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only students can create tickets");
+            throw new AccessDeniedException("Only students can create tickets");
         }
 
-        StudentEntity student = new StudentEntity();
-        student.setId(user.getId());
-        student.setFirstName(user.getFirstName());
-        student.setLastName(user.getLastName());
-        student.setEmail(user.getEmail());
+        StudentEntity student = entityManager.getReference(StudentEntity.class, user.getId());
 
         TicketEntity ticket = new TicketEntity();
         ticket.setTitle(request.title());

@@ -20,7 +20,7 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "accounts")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "account_type", discriminatorType = DiscriminatorType.STRING)
 @Getter
 @Setter

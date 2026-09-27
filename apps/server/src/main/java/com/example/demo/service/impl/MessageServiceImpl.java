@@ -105,6 +105,9 @@ public class MessageServiceImpl implements MessageService {
 
     private void validateTicketReadAccess(TicketEntity ticket, UserPrincipal user) {
         switch (user.getAccountType()) {
+            case ADMIN -> {
+                // Admins have access to all tickets, no additional validation needed
+            }
             case STUDENT ->
                 validateStudentOwnership(ticket, user.getId());
             case ADVISOR ->

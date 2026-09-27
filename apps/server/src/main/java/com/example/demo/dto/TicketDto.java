@@ -37,8 +37,8 @@ public final class TicketDto {
             boolean active,
             TicketCategory category,
             TicketPriority priority,
-            AuthDto.AccountResponse generatedBy,
-            AuthDto.AccountResponse assignedTo
+            StudentDto.Response generatedBy,
+            AdvisorDto.Response assignedTo
     ) implements Serializable {
 
         private static final long serialVersionUID = 1L;
@@ -53,8 +53,8 @@ public final class TicketDto {
                     ticket.isActive(),
                     ticket.getCategory(),
                     ticket.getPriority(),
-                    ticket.getGeneratedBy() != null ? AuthDto.AccountResponse.fromEntity(ticket.getGeneratedBy()) : null,
-                    ticket.getAssignedTo() != null ? AuthDto.AccountResponse.fromEntity(ticket.getAssignedTo()) : null
+                    ticket.getGeneratedBy() != null ? StudentDto.Response.fromEntity(ticket.getGeneratedBy()) : null,
+                    ticket.getAssignedTo() != null ? AdvisorDto.Response.fromEntity(ticket.getAssignedTo()) : null
             );
         }
     }
