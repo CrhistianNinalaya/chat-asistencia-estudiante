@@ -53,30 +53,29 @@ git diff --cached -U5 -- . ':(exclude)docs/review-*.md' ':(exclude).agent/*' $AR
 
 Evaluate every staged file against the project's authoritative source of truth:
 
-### 1. Updated Repository Invariants (`AGENTS.md` & `SPEC.md`)
-Audit the staged changes against all rules and constraints defined in [`AGENTS.md`](../../AGENTS.md), incorporating any newly staged convention updates from Step 2:
-- **Compliance with new conventions:** Ensure implementation files strictly follow any new rules introduced in the staged `.md` files (e.g., verifying that tests are colocated as siblings, hooks do not contain pure domain logic, etc.).
-- **Baseline constraints and prohibitions:** Strict TypeScript without non-null assertions (`!`), pure domain separation, no UI libraries.
-- **Code style and architecture:** Parameter limits (max 2 positional), component layout, function declarations, CSS tokens (`var(--...)`).
-- **Linter and clean code invariants:** No inline comments inside code bodies, standard global built-ins (`Number.parseInt`), etc.
+### 1. Repository Invariants Compliance ([`AGENTS.md`](../../AGENTS.md))
+Audit the staged changes against all rules and constraints defined in [`AGENTS.md`](../../AGENTS.md), which serves as the single source of truth for:
+- Clean code and language standards (zero inline comments, 100% English).
+- Date and time handling (`Instant` UTC boundaries).
+- Database and JPA performance (N+1 query prevention, transaction boundaries, cursor pagination).
+- Modern Java and SonarQube rules (pattern switch, no empty blocks, unused variables).
+- Architecture, security, and service-level authorization boundaries.
 
-### 2. Domain & Mathematical Soundness
-Cross-check against relevant project domain skills (`sa-coordinates`, `pathfinding-engine`, `gta-graph-data`):
-- Coordinate axis mapping (`lat` is GTA `y`, `lng` is GTA `x`, `z` is elevation).
-- Numerical safety (avoid `NaN`, ensure `Number.isFinite()` on coordinates and inputs).
-- Graph connectivity and heuristic margins where graph/routing code is touched.
-- Array bounds, safe lookups under `noUncheckedIndexedAccess`, and React lifecycle/memory cleanup.
+Any violation of an invariant defined in [`AGENTS.md`](../../AGENTS.md) must be documented in a review file.
 
-### 3. Automated Verification Run
-Run the verification suite to ensure nothing is broken:
+### 2. End-to-End Flow Traceability & Contract Integrity
+Verify that changes maintain seamless flow across all application layers:
+- **Controller & DTO Flow:** Validate that request parameters (e.g. `before`, `limit`), validation constraints (`@Valid`, `@Size`, `@NotBlank`), and response DTOs properly connect into the service methods.
+- **WebSocket & Messaging Flow:** Ensure payload serialization and destination topics (e.g. `/topic/chat/{ticketId}`) align between publishers and subscribers.
+- **Documentation Sync:** Ensure changes to endpoints, query parameters, or payloads are accurately reflected in `README.md`.
 
-```bash
-pnpm test
-pnpm run verify-graph
-pnpm run build
-```
+### 3. Duplication & Abstraction Scout
+Detect boilerplate and repetition introduced in staged code:
+- **Repetitive Query & Exception Handling:** Look for duplicated `repository.findById(id).orElseThrow(...)` or repeated access checks across multiple service methods that should be extracted into shared private helpers.
+- **Validation Consistency:** Ensure validation logic (e.g. active ticket check, sender role check) is unified rather than copy-pasted across methods.
 
-Any compilation error, type failure, or broken test introduced in the staged changes is a **P0** issue.
+### 4. Verification & Build
+Verify that the project compiles cleanly and passes existing checks without errors.
 
 ## Step 5 — Determine Numbering for `review-#.md`
 
