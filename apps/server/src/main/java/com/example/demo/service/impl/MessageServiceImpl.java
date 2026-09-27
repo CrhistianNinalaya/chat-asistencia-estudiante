@@ -18,7 +18,6 @@ import com.example.demo.dto.MessageDto;
 import com.example.demo.entity.AccountEntity;
 import com.example.demo.entity.AdvisorEntity;
 import com.example.demo.entity.MessageEntity;
-import com.example.enums.AccountType;
 import com.example.demo.entity.StudentEntity;
 import com.example.demo.entity.TicketEntity;
 import com.example.demo.repository.AccountRepository;
@@ -106,17 +105,23 @@ public class MessageServiceImpl implements MessageService {
 
     private void validateTicketReadAccess(TicketEntity ticket, UserPrincipal user) {
         switch (user.getAccountType()) {
-            case STUDENT -> validateStudentOwnership(ticket, user.getId());
-            case ADVISOR -> validateAdvisorReadAccess(ticket, user.getId());
-            case null, default -> throw new AccessDeniedException("User role is not authorized to view messages");
+            case STUDENT ->
+                validateStudentOwnership(ticket, user.getId());
+            case ADVISOR ->
+                validateAdvisorReadAccess(ticket, user.getId());
+            case null, default ->
+                throw new AccessDeniedException("User role is not authorized to view messages");
         }
     }
 
     private void validateAndAssignSender(TicketEntity ticket, AccountEntity account) {
         switch (account) {
-            case StudentEntity student -> validateStudentOwnership(ticket, student.getId());
-            case AdvisorEntity advisor -> assignAdvisorIfNeeded(ticket, advisor);
-            case null, default -> throw new AccessDeniedException("User role is not authorized to send messages");
+            case StudentEntity student ->
+                validateStudentOwnership(ticket, student.getId());
+            case AdvisorEntity advisor ->
+                assignAdvisorIfNeeded(ticket, advisor);
+            case null, default ->
+                throw new AccessDeniedException("User role is not authorized to send messages");
         }
     }
 
