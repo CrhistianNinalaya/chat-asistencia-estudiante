@@ -16,6 +16,7 @@ This repository (`chat-asistencia-estudiante`) adheres to strict quality, archit
 
 - **Instant for Timestamps:** Always use `java.time.Instant` for all points in time (e.g., `sentAt`, `startedAt`, `closedAt`, pagination cursors). Never use `LocalDateTime` or `LocalDate` for temporal timestamps.
 - **Guaranteed UTC Boundaries:** Preserve `spring.jpa.properties.hibernate.jdbc.time_zone=UTC`, `spring.jackson.time-zone=UTC`, and JVM default UTC (`TimeZone.setDefault(TimeZone.getTimeZone("UTC"))`) to eliminate timezone drift across JDBC/MySQL and Jackson JSON serialization.
+- **Microsecond Timestamp Precision (TIMESTAMP(6)):** Every database column representing an `Instant` or timestamp must be defined with microsecond precision (`TIMESTAMP(6)`) in SQL DDL and explicitly mapped with `columnDefinition = "TIMESTAMP(6)"` in `@Column` annotations. This guarantees sub-second resolution and avoids cursor pagination collisions.
 
 ---
 

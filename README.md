@@ -42,7 +42,7 @@ flowchart TD
             REST --> Service[Service Layer]
             
             WS[Endpoint /chat-websocket] --> Broker[Simple In-Memory Broker]
-            Broker --> PubSub["Pub/Sub: /topic/chat/{chatId}"]
+            Broker --> PubSub["Pub/Sub: /topic/chat/{ticketId}"]
 
             Service --> Repos[Spring Data JPA Repositories]
         end
@@ -97,7 +97,7 @@ components/
 
 ## 🚀 Características Principales
 
-- **Mensajería en Tiempo Real:** Comunicación instantánea sin recargas mediante WebSockets y protocolo STOMP (`/topic/chat/{chatId}`).
+- **Mensajería en Tiempo Real:** Comunicación instantánea sin recargas mediante WebSockets y protocolo STOMP (`/topic/chat/{ticketId}`).
 - **Gestión de Tickets y Consultas:** Clasificación por niveles de prioridad (Alta, Media, Baja) y categorías académicas.
 - **Segmentación por Roles:**
   - **Estudiante:** Apertura de solicitudes de soporte y seguimiento en tiempo real de sus dudas.
@@ -142,9 +142,9 @@ components/
 | `POST` | `/api/tickets` | Crea un nuevo ticket de soporte | `{ "title": "...", "description": "...", "category": "GENERAL\|TECHNICAL\|BILLING\|FEEDBACK" }` |
 
 ### ✉️ Mensajes
-| Método | Endpoint | Descripción | Body (JSON) |
+| Método | Endpoint | Descripción | Parámetros Query / Body |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/tickets/{ticketId}/messages` | Historial de mensajes de un ticket | N/A |
+| `GET` | `/api/tickets/{ticketId}/messages` | Historial paginado con cursor para scroll infinito | `?before={ISO-8601}` (opcional)<br>`?limit={1-100}` (por defecto 30) |
 | `POST` | `/api/tickets/{ticketId}/messages` | Registra y emite el mensaje vía WebSocket | `{ "content": "..." }` |
 
 ---

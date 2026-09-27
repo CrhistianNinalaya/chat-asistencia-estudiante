@@ -45,10 +45,10 @@ public class TicketEntity {
     @Column(name = "description", nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "started_at", nullable = false, updatable = false)
+    @Column(name = "started_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP(6)")
     private Instant startedAt;
 
-    @Column(name = "closed_at")
+    @Column(name = "closed_at", columnDefinition = "TIMESTAMP(6)")
     private Instant closedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)

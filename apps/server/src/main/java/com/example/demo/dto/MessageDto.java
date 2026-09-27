@@ -2,6 +2,7 @@ package com.example.demo.dto;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import com.example.demo.entity.AccountEntity;
@@ -43,11 +44,20 @@ public final class MessageDto {
                     entity.getId(),
                     entity.getContent(),
                     entity.getSentAt(),
-                    entity.getChat().getId(),
+                    entity.getTicket().getId(),
                     account.getId(),
                     fullName,
                     account.getAccountType()
             );
         }
+    }
+
+    public record PagedResponse(
+            List<Response> messages,
+            boolean hasMore,
+            Instant nextCursor
+            ) implements Serializable {
+
+        private static final long serialVersionUID = 1L;
     }
 }

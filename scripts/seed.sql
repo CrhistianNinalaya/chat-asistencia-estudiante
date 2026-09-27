@@ -22,8 +22,8 @@ CREATE TABLE tickets (
     id BINARY(16) NOT NULL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    started_at TIMESTAMP NOT NULL,
-    closed_at TIMESTAMP NULL,
+    started_at TIMESTAMP(6) NOT NULL,
+    closed_at TIMESTAMP(6) NULL,
     generated_by BINARY(16) NOT NULL,
     assigned_to BINARY(16) NULL,
     active BIT(1) NOT NULL DEFAULT 1,
@@ -35,12 +35,14 @@ CREATE TABLE tickets (
 CREATE TABLE messages (
     id BINARY(16) NOT NULL PRIMARY KEY,
     content TEXT NOT NULL,
-    sent_at TIMESTAMP NOT NULL,
-    chat_id BINARY(16) NOT NULL,
+    sent_at TIMESTAMP(6) NOT NULL,
+    ticket_id BINARY(16) NOT NULL,
     account_id BINARY(16) NOT NULL,
-    CONSTRAINT fk_msg_chat FOREIGN KEY (chat_id) REFERENCES tickets(id),
+    CONSTRAINT fk_msg_ticket FOREIGN KEY (ticket_id) REFERENCES tickets(id),
     CONSTRAINT fk_msg_account FOREIGN KEY (account_id) REFERENCES accounts(id)
 );
+
+CREATE INDEX idx_messages_ticket_sent_at ON messages(ticket_id, sent_at DESC);
 
 -- 3. Cuentas (Password es BCrypt de 123456)
 INSERT INTO accounts (id, first_name, last_name, email, password, account_type) VALUES
@@ -85,7 +87,7 @@ INSERT INTO tickets (id, title, description, started_at, closed_at, generated_by
 );
 
 -- 5. Mensajes
-INSERT INTO messages (id, content, sent_at, chat_id, account_id) VALUES
+INSERT INTO messages (id, content, sent_at, ticket_id, account_id) VALUES
 (
     UUID_TO_BIN('d1111111-1111-1111-1111-111111111111', 0),
     'Buenas tardes, realicé mi pago pero aún figura como pendiente.',
