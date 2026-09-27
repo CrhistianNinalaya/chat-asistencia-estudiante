@@ -6,7 +6,8 @@ This repository (`chat-asistencia-estudiante`) adheres to strict quality, archit
 
 ## 1. Clean Code & Language Standards
 
-- **Zero Inline Comments:** Absolutely NO inline comments (`// ...` or `/* ... */`) inside method or function bodies. Code must be self-explanatory through expressive naming and clear abstractions.
+- **Zero Inline Comments (Production Code):** Absolutely NO inline comments (`// ...` or `/* ... */`) inside method or function bodies in production code. Code must be self-explanatory through expressive naming and clear abstractions.
+- **AAA Testing Comments Exception:** In test files, explicitly delineate the structure of every test using simple section markers where each phase begins: `// Arrange`, `// Act`, and `// Assert` (or `// Act & Assert` for MockMvc chained assertions).
 - **Strict English Everywhere:** 100% of all code must be written in English. This applies to identifiers, classes, methods, variables, exception types, exception messages, validation constraint messages, logs, tests, and git commit messages.
 - **Self-Documenting Code:** Rely on descriptive domain terminology rather than explanatory comments.
 
