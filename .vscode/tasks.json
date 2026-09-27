@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "nx:serve-debug",
+      "type": "shell",
+      "command": "pnpm nx serve-debug server",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*Listening for transport dt_socket at address.*",
+          "endsPattern": ".*Listening for transport dt_socket at address: 5005.*|.*Started ChatSupportApplication.*"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    }
+  ]
+}

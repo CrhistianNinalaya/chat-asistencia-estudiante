@@ -4,11 +4,9 @@
   "description": "Student Support Chat - Fullstack Monorepo",
   "scripts": {
     "dev:server": "nx serve server",
+    "debug:server": "nx serve-debug server",
     "build:server": "nx build server",
-    "test:server": "nx test server",
-    "server:dev": "nx serve server",
-    "server:build": "nx build server",
-    "server:test": "nx test server"
+    "test:server": "nx test server"
   },
   "keywords": [],
   "author": "Crhistian Ninalaya",

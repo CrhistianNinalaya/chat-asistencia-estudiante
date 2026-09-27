@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug Server (Spring Boot - Direct)",
+      "request": "launch",
+      "mainClass": "com.example.demo.ChatSupportApplication",
+      "projectName": "chat-support-server",
+      "cwd": "${workspaceFolder}/apps/server",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Nx: Serve & Attach (Auto)",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 5005,
+      "preLaunchTask": "nx:serve-debug"
+    },
+    {
+      "type": "java",
+      "name": "Attach to Nx Server (Port 5005)",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 5005
+    }
+  ]
+}

@@ -12,6 +12,14 @@
         "envFile": ".env"
       }
     },
+    "serve-debug": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "./mvnw spring-boot:run -Dspring-boot.run.jvmArguments=\"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005\"",
+        "cwd": "apps/server",
+        "envFile": ".env"
+      }
+    },
     "build": {
       "executor": "nx:run-commands",
       "options": {
