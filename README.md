@@ -42,7 +42,7 @@ flowchart TD
             REST --> Service[Service Layer]
             
             WS[Endpoint /chat-websocket] --> Broker[Simple In-Memory Broker]
-            Broker --> PubSub["Pub/Sub: /topic/chat/{ticketId}"]
+            Broker --> PubSub["Pub/Sub: /topic/tickets/{ticketId}"]
 
             Service --> Repos[Spring Data JPA Repositories]
         end
@@ -97,11 +97,12 @@ components/
 
 ## 🚀 Características Principales
 
-- **Mensajería en Tiempo Real:** Comunicación instantánea sin recargas mediante WebSockets y protocolo STOMP (`/topic/chat/{ticketId}`).
-- **Gestión de Tickets y Consultas:** Clasificación por niveles de prioridad (Alta, Media, Baja) y categorías académicas.
+- **Mensajería en Tiempo Real:** Comunicación instantánea sin recargas mediante WebSockets y protocolo STOMP (`/topic/tickets/{ticketId}`).
+- **Gestión de Tickets y Consultas:** Clasificación por niveles de prioridad (Alta, Media, Baja), categorías académicas y ciclo de vida de estados (`OPEN`, `ASSIGNED`, `IN_PROGRESS`, `WAITING_STUDENT`, `RESOLVED`, `CLOSED`).
 - **Segmentación por Roles:**
   - **Estudiante:** Apertura de solicitudes de soporte y seguimiento en tiempo real de sus dudas.
-  - **Asesor / Soporte:** Panel de control con bandeja de entrada filtrable por prioridad para atención de tickets.
+  - **Asesor / Soporte:** Panel de control con bandeja de entrada filtrable por prioridad y estado para atención de tickets.
+  - **Administrador:** Supervisión global y actualización irrestricta de tickets.
 - **Monorepo Optimizado con Nx:** Comandos unificados para desarrollo, pruebas y construcción de frontend y backend.
 - **Concurrencia de Alto Rendimiento:** Habilitación de Virtual Threads de Java 25 LTS para optimizar el I/O en Spring Boot.
 
@@ -138,8 +139,9 @@ components/
 ### 💬 Tickets
 | Método | Endpoint | Descripción | Parámetros Query / Body |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/tickets` | Lista tickets según rol (asesor: asignados activos y libres; estudiante: propios) | `?active={true\|false}` (opcional)<br>`?priority={LOW\|MEDIUM\|HIGH}` (opcional SLA) |
-| `POST` | `/api/tickets` | Crea un nuevo ticket de soporte | `{ "title": "...", "description": "...", "category": "GENERAL\|TECHNICAL\|BILLING\|FEEDBACK" }` |
+| `GET` | `/api/tickets` | Lista tickets según rol (asesor: asignados y libres; estudiante: propios; admin: todos) | `?status={OPEN\|ASSIGNED\|IN_PROGRESS\|WAITING_STUDENT\|RESOLVED\|CLOSED}`<br>`?priority={LOW\|MEDIUM\|HIGH}` |
+| `POST` | `/api/tickets` | Crea un nuevo ticket de soporte (solo estudiantes) | `{ "title": "...", "description": "...", "category": "GENERAL\|TECHNICAL\|BILLING\|FEEDBACK" }` |
+| `PATCH` | `/api/tickets/{ticketId}/status` | Actualiza estado del ticket (asesores/admin) y emite evento STOMP | `{ "status": "RESOLVED", "resolutionSummary": "...", "resolutionCategory": "SYSTEM_FIX" }` |
 
 ### ✉️ Mensajes
 | Método | Endpoint | Descripción | Parámetros Query / Body |
@@ -152,8 +154,10 @@ components/
 ## 🔌 Canales de WebSocket (STOMP)
 
 - **Handshake Endpoint:** `ws://localhost:8080/chat-websocket`
-- **Canal de Suscripción (Topic):** `/topic/chat/{ticketId}`  
-  *(Los clientes suscritos reciben las publicaciones en tiempo real cada vez que un participante envía un mensaje).*
+- **Canal de Mensajería del Ticket:** `/topic/tickets/{ticketId}`  
+  *(Los clientes suscritos reciben las publicaciones de nuevos mensajes en tiempo real).*
+- **Canal de Estado del Ticket:** `/topic/tickets/{ticketId}/status`  
+  *(Los clientes suscritos reciben eventos en tiempo real ante transiciones de estado del ticket).*
 
 ---
 

@@ -56,7 +56,7 @@ public class MessageController {
         }
 
         MessageDto.Response response = messageService.sendMessage(request, ticketId, user);
-        messagingTemplate.convertAndSend("/topic/chat/" + ticketId, response);
+        messagingTemplate.convertAndSend("/topic/tickets/" + ticketId, response);
         return response;
     }
 }

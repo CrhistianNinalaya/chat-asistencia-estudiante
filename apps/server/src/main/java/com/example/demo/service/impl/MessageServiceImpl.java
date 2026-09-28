@@ -9,20 +9,27 @@ import java.util.UUID;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.dto.MessageDto;
+import com.example.demo.dto.TicketDto;
 import com.example.demo.entity.AccountEntity;
 import com.example.demo.entity.AdvisorEntity;
 import com.example.demo.entity.MessageEntity;
 import com.example.demo.entity.StudentEntity;
+import com.example.demo.entity.TicketActivityEntity;
+import com.example.demo.entity.TicketAssignmentHistoryEntity;
 import com.example.demo.entity.TicketEntity;
+import com.example.demo.enums.TicketActivityType;
 import com.example.demo.enums.TicketStatus;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.MessageRepository;
+import com.example.demo.repository.TicketActivityRepository;
+import com.example.demo.repository.TicketAssignmentHistoryRepository;
 import com.example.demo.repository.TicketRepository;
 import com.example.demo.security.UserPrincipal;
 import com.example.demo.service.MessageService;
@@ -40,6 +47,9 @@ public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
     private final TicketRepository ticketRepository;
     private final AccountRepository accountRepository;
+    private final TicketActivityRepository ticketActivityRepository;
+    private final TicketAssignmentHistoryRepository assignmentHistoryRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     @Transactional(readOnly = true)
@@ -147,12 +157,43 @@ public class MessageServiceImpl implements MessageService {
     private void assignAdvisorIfNeeded(TicketEntity ticket, AdvisorEntity advisor) {
         if (ticket.getAssignedTo() == null) {
             ticket.setAssignedTo(advisor);
+            recordAssignment(ticket, advisor);
             if (ticket.getStatus() == TicketStatus.OPEN) {
-                ticket.setStatus(TicketStatus.IN_PROGRESS);
+                transitionStatus(ticket, TicketStatus.IN_PROGRESS, advisor.getId(), "Status transitioned from OPEN to IN_PROGRESS upon initial advisor reply");
+            } else {
+                ticketRepository.save(ticket);
             }
-            ticketRepository.save(ticket);
         } else if (!ticket.getAssignedTo().getId().equals(advisor.getId())) {
             throw new AccessDeniedException("Advisors cannot send messages to tickets assigned to another advisor");
+        } else if (ticket.getStatus() == TicketStatus.ASSIGNED) {
+            transitionStatus(ticket, TicketStatus.IN_PROGRESS, advisor.getId(), "Status transitioned from ASSIGNED to IN_PROGRESS upon advisor reply");
         }
+    }
+
+    private void transitionStatus(TicketEntity ticket, TicketStatus newStatus, UUID actorId, String reason) {
+        ticket.setStatus(newStatus);
+        ticket.setClosedAt(null);
+        TicketEntity saved = ticketRepository.save(ticket);
+        recordActivity(saved, actorId, TicketActivityType.STATUS_CHANGED, reason);
+        messagingTemplate.convertAndSend("/topic/tickets/" + saved.getId() + "/status", TicketDto.Response.fromEntity(saved));
+    }
+
+    private void recordActivity(TicketEntity ticket, UUID actorId, TicketActivityType type, String details) {
+        AccountEntity actor = actorId != null ? accountRepository.getReferenceById(actorId) : null;
+        TicketActivityEntity activity = new TicketActivityEntity();
+        activity.setTicket(ticket);
+        activity.setActor(actor);
+        activity.setActivityType(type);
+        activity.setDetails(details);
+        ticketActivityRepository.save(activity);
+    }
+
+    private void recordAssignment(TicketEntity ticket, AdvisorEntity advisor) {
+        TicketAssignmentHistoryEntity history = new TicketAssignmentHistoryEntity();
+        history.setTicket(ticket);
+        history.setAdvisor(advisor);
+        history.setAssignedAt(Instant.now());
+        assignmentHistoryRepository.save(history);
+        recordActivity(ticket, advisor.getId(), TicketActivityType.ADVISOR_ASSIGNED, "Advisor assigned to ticket upon replying");
     }
 }

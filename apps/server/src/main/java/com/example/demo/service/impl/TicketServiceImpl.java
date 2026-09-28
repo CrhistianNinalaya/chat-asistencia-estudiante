@@ -11,12 +11,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dto.TicketDto;
+import com.example.demo.entity.AccountEntity;
 import com.example.demo.entity.AdvisorEntity;
 import com.example.demo.entity.StudentEntity;
+import com.example.demo.entity.TicketActivityEntity;
+import com.example.demo.entity.TicketAssignmentHistoryEntity;
 import com.example.demo.entity.TicketEntity;
 import com.example.demo.enums.AccountType;
+import com.example.demo.enums.TicketActivityType;
 import com.example.demo.enums.TicketPriority;
 import com.example.demo.enums.TicketStatus;
+import com.example.demo.repository.TicketActivityRepository;
+import com.example.demo.repository.TicketAssignmentHistoryRepository;
 import com.example.demo.repository.TicketRepository;
 import com.example.demo.security.UserPrincipal;
 import com.example.demo.service.TicketService;
@@ -30,6 +36,8 @@ import lombok.RequiredArgsConstructor;
 public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
+    private final TicketActivityRepository ticketActivityRepository;
+    private final TicketAssignmentHistoryRepository assignmentHistoryRepository;
     private final EntityManager entityManager;
 
     @Override
@@ -77,6 +85,7 @@ public class TicketServiceImpl implements TicketService {
         ticket.setGeneratedBy(student);
 
         TicketEntity saved = ticketRepository.save(ticket);
+        recordActivity(saved, user.getId(), TicketActivityType.TICKET_CREATED, "Ticket created by student");
         return TicketDto.Response.fromEntity(saved);
     }
 
@@ -85,8 +94,8 @@ public class TicketServiceImpl implements TicketService {
     public TicketDto.Response updateTicketStatus(UUID ticketId, TicketDto.StatusUpdateRequest request, UserPrincipal user) {
         validateStatusUpdateRequest(request);
         TicketEntity ticket = getTicketOrThrow(ticketId);
-        validateStatusUpdateAuthorization(user, ticket);
-        applyStatusTransition(ticket, request);
+        validateStatusUpdateAuthorization(user, ticket, request.status());
+        applyStatusTransition(ticket, request, user);
 
         TicketEntity saved = ticketRepository.save(ticket);
         return TicketDto.Response.fromEntity(saved);
@@ -103,7 +112,7 @@ public class TicketServiceImpl implements TicketService {
                 .orElseThrow(() -> new EntityNotFoundException("Ticket not found with id: " + ticketId));
     }
 
-    private void validateStatusUpdateAuthorization(UserPrincipal user, TicketEntity ticket) {
+    private void validateStatusUpdateAuthorization(UserPrincipal user, TicketEntity ticket, TicketStatus targetStatus) {
         if (user == null || (user.getAccountType() != AccountType.ADVISOR && user.getAccountType() != AccountType.ADMIN)) {
             throw new AccessDeniedException("Only advisors and administrators can update ticket status");
         }
@@ -114,27 +123,43 @@ public class TicketServiceImpl implements TicketService {
         if (ticket.getAssignedTo() != null && !ticket.getAssignedTo().getId().equals(user.getId())) {
             throw new AccessDeniedException("Advisors cannot modify tickets assigned to another advisor");
         }
-        if (ticket.getAssignedTo() == null) {
+        if (ticket.getAssignedTo() == null && targetStatus != TicketStatus.OPEN) {
             AdvisorEntity advisor = entityManager.getReference(AdvisorEntity.class, user.getId());
             ticket.setAssignedTo(advisor);
+            recordAssignment(ticket, advisor);
         }
     }
 
-    private void applyStatusTransition(TicketEntity ticket, TicketDto.StatusUpdateRequest request) {
+    private void applyStatusTransition(TicketEntity ticket, TicketDto.StatusUpdateRequest request, UserPrincipal user) {
         if (ticket.getStatus() == TicketStatus.CLOSED) {
             throw new IllegalStateException("Cannot change the status of a closed ticket");
         }
         switch (request.status()) {
             case RESOLVED ->
-                applyResolvedStatus(ticket, request);
+                applyResolvedStatus(ticket, request, user);
             case CLOSED ->
-                applyClosedStatus(ticket, request);
-            case IN_PROGRESS, WAITING_STUDENT, ASSIGNED, OPEN ->
-                applyActiveStatus(ticket, request.status());
+                applyClosedStatus(ticket, request, user);
+            case OPEN ->
+                applyOpenStatus(ticket, user);
+            case IN_PROGRESS, WAITING_STUDENT, ASSIGNED ->
+                applyActiveStatus(ticket, request.status(), user);
         }
     }
 
-    private void applyResolvedStatus(TicketEntity ticket, TicketDto.StatusUpdateRequest request) {
+    private void applyOpenStatus(TicketEntity ticket, UserPrincipal user) {
+        if (ticket.getAssignedTo() != null) {
+            closeActiveAssignment(ticket.getId(), "Released back to queue by advisor");
+            ticket.setAssignedTo(null);
+            recordActivity(ticket, user.getId(), TicketActivityType.ADVISOR_UNASSIGNED, "Advisor released ticket to open queue");
+        }
+        ticket.setStatus(TicketStatus.OPEN);
+        ticket.setResolutionSummary(null);
+        ticket.setResolutionCategory(null);
+        ticket.setClosedAt(null);
+        recordActivity(ticket, user.getId(), TicketActivityType.STATUS_CHANGED, "Status changed to OPEN");
+    }
+
+    private void applyResolvedStatus(TicketEntity ticket, TicketDto.StatusUpdateRequest request, UserPrincipal user) {
         if (request.resolutionSummary() == null || request.resolutionSummary().isBlank()) {
             throw new IllegalArgumentException("Resolution summary is required when resolving a ticket");
         }
@@ -145,9 +170,12 @@ public class TicketServiceImpl implements TicketService {
         ticket.setResolutionSummary(request.resolutionSummary().trim());
         ticket.setResolutionCategory(request.resolutionCategory());
         ticket.setClosedAt(Instant.now());
+
+        String details = "Category: " + request.resolutionCategory() + " | Summary: " + request.resolutionSummary().trim();
+        recordActivity(ticket, user.getId(), TicketActivityType.TICKET_RESOLVED, details);
     }
 
-    private void applyClosedStatus(TicketEntity ticket, TicketDto.StatusUpdateRequest request) {
+    private void applyClosedStatus(TicketEntity ticket, TicketDto.StatusUpdateRequest request, UserPrincipal user) {
         ticket.setStatus(TicketStatus.CLOSED);
         if (request.resolutionSummary() != null && !request.resolutionSummary().isBlank()) {
             ticket.setResolutionSummary(request.resolutionSummary().trim());
@@ -156,11 +184,43 @@ public class TicketServiceImpl implements TicketService {
             ticket.setResolutionCategory(request.resolutionCategory());
         }
         ticket.setClosedAt(Instant.now());
+        recordActivity(ticket, user.getId(), TicketActivityType.STATUS_CHANGED, "Ticket permanently closed");
     }
 
-    private void applyActiveStatus(TicketEntity ticket, TicketStatus targetStatus) {
+    private void applyActiveStatus(TicketEntity ticket, TicketStatus targetStatus, UserPrincipal user) {
+        TicketStatus previousStatus = ticket.getStatus();
         ticket.setStatus(targetStatus);
+        ticket.setResolutionSummary(null);
+        ticket.setResolutionCategory(null);
         ticket.setClosedAt(null);
+        recordActivity(ticket, user.getId(), TicketActivityType.STATUS_CHANGED, "Status transitioned from " + previousStatus + " to " + targetStatus);
+    }
+
+    private void recordActivity(TicketEntity ticket, UUID actorId, TicketActivityType type, String details) {
+        AccountEntity actor = actorId != null ? entityManager.getReference(AccountEntity.class, actorId) : null;
+        TicketActivityEntity activity = new TicketActivityEntity();
+        activity.setTicket(ticket);
+        activity.setActor(actor);
+        activity.setActivityType(type);
+        activity.setDetails(details);
+        ticketActivityRepository.save(activity);
+    }
+
+    private void recordAssignment(TicketEntity ticket, AdvisorEntity advisor) {
+        TicketAssignmentHistoryEntity history = new TicketAssignmentHistoryEntity();
+        history.setTicket(ticket);
+        history.setAdvisor(advisor);
+        history.setAssignedAt(Instant.now());
+        assignmentHistoryRepository.save(history);
+        recordActivity(ticket, advisor.getId(), TicketActivityType.ADVISOR_ASSIGNED, "Advisor assigned to ticket");
+    }
+
+    private void closeActiveAssignment(UUID ticketId, String reason) {
+        assignmentHistoryRepository.findActiveAssignment(ticketId).ifPresent(history -> {
+            history.setUnassignedAt(Instant.now());
+            history.setReason(reason);
+            assignmentHistoryRepository.save(history);
+        });
     }
 
     private List<TicketEntity> listTicketsForAdvisor(

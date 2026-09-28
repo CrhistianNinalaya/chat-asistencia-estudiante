@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,11 +25,14 @@ import org.springframework.security.access.AccessDeniedException;
 import com.example.demo.dto.TicketDto;
 import com.example.demo.entity.AdvisorEntity;
 import com.example.demo.entity.StudentEntity;
+import com.example.demo.entity.TicketActivityEntity;
 import com.example.demo.entity.TicketEntity;
 import com.example.demo.enums.AccountType;
 import com.example.demo.enums.ResolutionCategory;
 import com.example.demo.enums.TicketCategory;
 import com.example.demo.enums.TicketStatus;
+import com.example.demo.repository.TicketActivityRepository;
+import com.example.demo.repository.TicketAssignmentHistoryRepository;
 import com.example.demo.repository.TicketRepository;
 import com.example.demo.security.UserPrincipal;
 import com.example.demo.service.impl.TicketServiceImpl;
@@ -40,6 +45,12 @@ class TicketServiceTest {
 
     @Mock
     private TicketRepository ticketRepository;
+
+    @Mock
+    private TicketActivityRepository ticketActivityRepository;
+
+    @Mock
+    private TicketAssignmentHistoryRepository assignmentHistoryRepository;
 
     @Mock
     private EntityManager entityManager;
@@ -85,6 +96,7 @@ class TicketServiceTest {
         assertEquals(TicketStatus.OPEN, response.status());
         assertEquals("Title", response.title());
         verify(ticketRepository).save(any(TicketEntity.class));
+        verify(ticketActivityRepository).save(any(TicketActivityEntity.class));
     }
 
     @Test
@@ -135,6 +147,7 @@ class TicketServiceTest {
         assertEquals("Applied bug fix patch", response.resolutionSummary());
         assertEquals(ResolutionCategory.SYSTEM_FIX, response.resolutionCategory());
         assertNotNull(response.closedAt());
+        verify(ticketActivityRepository).save(any(TicketActivityEntity.class));
     }
 
     @Test
@@ -431,5 +444,83 @@ class TicketServiceTest {
         assertEquals(1, results.size());
         assertEquals(TicketStatus.IN_PROGRESS, results.getFirst().status());
         verify(ticketRepository).findAssignedOrUnassignedByStatus(advisorId, TicketStatus.IN_PROGRESS);
+    }
+
+    @Test
+    @DisplayName("Should release ticket to OPEN status and close active assignment")
+    void updateTicketStatus_ToOpen_ReleasesAssignmentAndResetsStatus() {
+        // Arrange
+        UUID advisorId = UUID.randomUUID();
+        UserPrincipal advisorUser = createUser(advisorId, AccountType.ADVISOR);
+        AdvisorEntity advisor = new AdvisorEntity();
+        advisor.setId(advisorId);
+
+        UUID ticketId = UUID.randomUUID();
+        TicketEntity ticket = new TicketEntity();
+        ticket.setId(ticketId);
+        ticket.setStatus(TicketStatus.IN_PROGRESS);
+        ticket.setAssignedTo(advisor);
+
+        TicketDto.StatusUpdateRequest request = new TicketDto.StatusUpdateRequest(
+                TicketStatus.OPEN,
+                null,
+                null
+        );
+
+        when(ticketRepository.findById(ticketId)).thenReturn(Optional.of(ticket));
+        when(assignmentHistoryRepository.findActiveAssignment(ticketId)).thenReturn(Optional.empty());
+        when(ticketRepository.save(any(TicketEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        TicketDto.Response response = ticketService.updateTicketStatus(ticketId, request, advisorUser);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(TicketStatus.OPEN, response.status());
+        assertNull(ticket.getAssignedTo());
+        verify(ticketRepository).save(ticket);
+        verify(ticketActivityRepository, times(2)).save(any(TicketActivityEntity.class));
+    }
+
+    @Test
+    @DisplayName("Should clear stale resolution metadata when transitioning ticket back to active status")
+    void updateTicketStatus_FromResolvedToActive_ClearsResolutionMetadata() {
+        // Arrange
+        UUID advisorId = UUID.randomUUID();
+        UserPrincipal advisorUser = createUser(advisorId, AccountType.ADVISOR);
+        AdvisorEntity advisor = new AdvisorEntity();
+        advisor.setId(advisorId);
+
+        UUID ticketId = UUID.randomUUID();
+        TicketEntity ticket = new TicketEntity();
+        ticket.setId(ticketId);
+        ticket.setStatus(TicketStatus.RESOLVED);
+        ticket.setAssignedTo(advisor);
+        ticket.setResolutionSummary("Old fix summary");
+        ticket.setResolutionCategory(ResolutionCategory.SYSTEM_FIX);
+        ticket.setClosedAt(Instant.now());
+
+        TicketDto.StatusUpdateRequest request = new TicketDto.StatusUpdateRequest(
+                TicketStatus.IN_PROGRESS,
+                null,
+                null
+        );
+
+        when(ticketRepository.findById(ticketId)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.save(any(TicketEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        TicketDto.Response response = ticketService.updateTicketStatus(ticketId, request, advisorUser);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(TicketStatus.IN_PROGRESS, response.status());
+        assertNull(response.resolutionSummary());
+        assertNull(response.resolutionCategory());
+        assertNull(response.closedAt());
+        assertNull(ticket.getResolutionSummary());
+        assertNull(ticket.getResolutionCategory());
+        assertNull(ticket.getClosedAt());
+        verify(ticketRepository).save(ticket);
     }
 }

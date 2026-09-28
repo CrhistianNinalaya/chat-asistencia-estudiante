@@ -80,20 +80,12 @@ public interface TicketRepository extends JpaRepository<TicketEntity, UUID> {
     @EntityGraph(attributePaths = {"generatedBy", "assignedTo"})
     @Query("""
         SELECT t FROM TicketEntity t
-        WHERE t.status IN (TicketStatus.RESOLVED, TicketStatus.CLOSED)
-          AND t.assignedTo.id = :advisorId
-        ORDER BY t.startedAt DESC
-    """)
-    List<TicketEntity> findClosedForAdvisor(@Param("advisorId") UUID advisorId);
-
-    @EntityGraph(attributePaths = {"generatedBy", "assignedTo"})
-    @Query("""
-        SELECT t FROM TicketEntity t
         WHERE t.status = :status
           AND (t.assignedTo.id = :advisorId OR t.assignedTo IS NULL)
         ORDER BY 
             CASE WHEN t.assignedTo.id = :advisorId THEN 1 ELSE 2 END ASC,
-            t.startedAt ASC
+            CASE WHEN :status IN (TicketStatus.RESOLVED, TicketStatus.CLOSED) THEN t.startedAt END DESC,
+            CASE WHEN :status NOT IN (TicketStatus.RESOLVED, TicketStatus.CLOSED) THEN t.startedAt END ASC
     """)
     List<TicketEntity> findAssignedOrUnassignedByStatus(
             @Param("advisorId") UUID advisorId,
