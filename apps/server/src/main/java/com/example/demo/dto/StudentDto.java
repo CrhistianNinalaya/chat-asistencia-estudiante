@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.example.demo.entity.StudentEntity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -16,6 +17,7 @@ public final class StudentDto {
 
     private StudentDto() {}
 
+    @Schema(name = "StudentCreateRequest")
     public record CreateRequest(
             @NotBlank(message = "First name is required")
             @Size(max = 50, message = "First name must not exceed 50 characters")
@@ -51,6 +53,7 @@ public final class StudentDto {
             String phoneNumber
     ) {}
 
+    @Schema(name = "StudentResponse")
     public record Response(
             UUID id,
             String firstName,

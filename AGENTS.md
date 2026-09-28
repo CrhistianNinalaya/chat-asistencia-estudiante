@@ -61,3 +61,20 @@ This repository (`chat-asistencia-estudiante`) adheres to strict quality, archit
 ## 6. Review & Git Workflow Invariants
 
 - **Unstaged Review Fixes (Working Area Only):** When applying fixes resulting from code reviews (`docs/review-*.md`), NEVER automatically stage the changed files (`git add`). Fixes must remain strictly in the working directory (unstaged) so that the developer can easily inspect them in isolation via `git diff` against the staged area.
+
+---
+
+## 7. Contract Verification & OpenAPI Invariants (CI, Hooks & Drift Detection)
+
+- **Client Build Isolation (Cloud CI / Static Hosts):** Cloud frontend build runners (such as Vercel, Netlify, or GitHub Actions) operate in pure Node.js environments without Java, Gradle, or MySQL. Therefore, `apps/client/src/api/generated/api-schema.ts` is committed to git as a versioned source of truth. Frontend builds and tests must NEVER rely on a live backend server at build time.
+- **100% Offline Codegen:** `tools/scripts/codegen-api.ts` operates entirely offline using the schema exported by Gradle (`apps/server/build/openapi.json`). If the schema file is absent, it automatically triggers `./gradlew test --tests OpenApiContractTest` to generate it in ~1.5s, eliminating any network or HTTP port dependency.
+- **Contract Drift Detection in CI & Pre-Push:** Whenever the backend changes any entity, DTO, or REST controller:
+  1. The local `.husky/pre-push` hook rejects the push if backend changes modified contracts without staging the updated `api-schema.ts`.
+  2. The GitHub Actions CI pipeline enforces the same check:
+     - Run `./gradlew test` (which triggers `OpenApiContractTest` to export `apps/server/build/openapi.json` offline).
+     - Run `pnpm codegen:api` (which generates client types from the offline schema).
+     - Run `git diff --exit-code apps/client/src/api/generated/api-schema.ts` (fails the build if backend API contracts changed without committing the updated client schema).
+- **Planned Deployment Topology (Primary Target):** The primary and most probable deployment targets are Vercel (Frontend) and Oracle Cloud Infrastructure / OCI Always Free (Backend). Runtime connectivity is governed strictly through client environment variables (`VITE_API_URL` and `VITE_WS_URL`) with CORS properly configured.
+- **Domain Layer Isolation:** UI components, hooks, and services must NEVER import directly from `api-schema.ts` (e.g., `components['schemas']['...']`). All consuming code must import from the domain types layer in `apps/client/src/types/` (`Ticket`, `TicketStatus`, `TICKET_STATUS`), preserving decoupling and clean architecture.
+- **Schema Naming Invariant:** Every backend DTO record exposed via REST must be explicitly annotated with `@Schema(name = "...")` to prevent simple-name collisions (such as multiple inner `Response` or `CreateRequest` records) during OpenAPI schema generation.
+

@@ -9,6 +9,7 @@ import com.example.demo.entity.AccountEntity;
 import com.example.demo.entity.MessageEntity;
 import com.example.demo.enums.AccountType;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -17,6 +18,7 @@ public final class MessageDto {
     private MessageDto() {
     }
 
+    @Schema(name = "MessageSendRequest")
     public record SendRequest(
             @NotBlank(message = "Message content must not be blank")
             @Size(max = 2000, message = "Message content must not exceed 2000 characters")
@@ -25,6 +27,7 @@ public final class MessageDto {
 
     }
 
+    @Schema(name = "MessageResponse")
     public record Response(
             UUID id,
             String content,
@@ -52,6 +55,7 @@ public final class MessageDto {
         }
     }
 
+    @Schema(name = "MessagePagedResponse")
     public record PagedResponse(
             List<Response> messages,
             boolean hasMore,

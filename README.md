@@ -52,9 +52,9 @@ flowchart TD
         MySQL[(Base de Datos MySQL 8)]
     end
 
-    subgraph CloudHosting["Despliegue en la Nube"]
-        VercelCloud[Vercel: Frontend Host]
-        BackendCloud[Cloud PaaS: Backend Host]
+    subgraph CloudHosting["Despliegue en la Nube (Topología Prevista)"]
+        VercelCloud["Vercel: Frontend Host (Opción Principal Prevista)"]
+        BackendCloud["Oracle Cloud OCI Always Free: Backend Host (Opción Principal Prevista)"]
     end
 
     UI -- "HTTP REST (JSON)" --> CORS
@@ -195,33 +195,44 @@ docker run -d --name mysql-chat \
   mysql:8.0
 ```
 
-### 4. Ejecución del Backend con Nx
-Desde la raíz del monorepo:
-```bash
-pnpm install
-pnpm dev:server
-```
-O directamente desde `apps/server`:
-```bash
-cd apps/server
-./gradlew bootRun
-```
-*Una vez activo, el contrato OpenAPI estará disponible en `http://localhost:8080/v3/api-docs` y la UI interactiva en `http://localhost:8080/swagger-ui.html`.*
+### 4. Ejecución del Entorno de Desarrollo
 
-### 5. Generación de Tipos TypeScript (OpenAPI Codegen)
-Con el backend en ejecución, genera o sincroniza automáticamente los contratos tipados para el frontend en `apps/client/src/api/generated/api-schema.ts`:
+- **Iniciar Todo el Monorepo (Frontend + Backend):**
+  ```bash
+  pnpm dev
+  ```
+  *Inicia simultáneamente las aplicaciones gestionadas por Nx en paralelo.*
+
+- **O Ejecutar por Componentes Separados:**
+  ```bash
+  # Backend (Spring Boot)
+  pnpm dev:server
+  # O directamente: cd apps/server && ./gradlew bootRun
+
+  # Frontend (React + Vite)
+  pnpm dev:client
+  ```
+
+### 5. Generación Offline de Tipos TypeScript (OpenAPI Codegen)
+Sincroniza los contratos tipados para el frontend en `apps/client/src/api/generated/api-schema.ts`:
 ```bash
 pnpm codegen:api
 ```
-*(Si el backend no está activo o no responde, el script informará la causa detallada y los pasos para iniciarlo).*
+*Operación 100% offline y determinista:*
+- Lee el esquema exportado por Gradle en `apps/server/build/openapi.json`.
+- Si el archivo aún no existe en el entorno local, ejecuta automáticamente `./gradlew test --tests OpenApiContractTest` para exportarlo en ~1.5s sin requerir un servidor HTTP en ejecución.
 
-### 6. Ejecución del Frontend con Nx
-Para iniciar el cliente en modo desarrollo con Vite:
-```bash
-pnpm dev:client
-```
+### 6. Inspección y Tareas Globales del Monorepo con Nx
 
-### 7. Inspección del Monorepo y Proyectos Afectados con Nx
+- **Compilar todos los proyectos:**
+  ```bash
+  pnpm build
+  ```
+
+- **Ejecutar todas las pruebas:**
+  ```bash
+  pnpm test
+  ```
 
 - **Visualizar el Grafo de Dependencias (Servidor Web Interactivo):**
   ```bash
@@ -238,7 +249,6 @@ pnpm dev:client
   ```bash
   pnpm nx show projects --affected --base=origin/main
   ```
-  *Imprime directamente en consola los proyectos con cambios respecto a `origin/main` (reemplazo oficial de `print-affected`).*
 
 - **Ejecutar Tests y Build de Proyectos Afectados (con Cache):**
   ```bash
@@ -255,7 +265,7 @@ pnpm dev:client
 - [x] Actualización de dependencias a **Spring Boot 4.1.1 + Jakarta EE + Java 25 LTS**.
 - [x] Migración del sistema de construcción backend a **Gradle 9.8.0**.
 - [x] Refactorización completa de base de datos y backend al inglés.
-- [x] Documentación interactiva con **OpenAPI / Swagger UI** (`springdoc-openapi`) y script de sincronización de contratos TypeScript (`pnpm codegen:api`).
+- [x] Documentación interactiva con **OpenAPI / Swagger UI** (`springdoc-openapi`) y script de sincronización offline de contratos TypeScript (`pnpm codegen:api`).
 - [ ] Creación de aplicación **React en `apps/client`** (Vite + CSS Modules nativo + STOMP client + Vitest).
 - [ ] Implementación de **Spring Security 6 con JWT** para autenticación segura sin estado.
-- [ ] Despliegue de Frontend en **Vercel** y Backend en la nube con pipeline CI/CD en **GitHub Actions**.
+- [ ] Despliegue en la nube previsto: Frontend en **Vercel** y Backend en **Oracle Cloud (OCI Always Free)** con pipeline CI/CD en **GitHub Actions**.

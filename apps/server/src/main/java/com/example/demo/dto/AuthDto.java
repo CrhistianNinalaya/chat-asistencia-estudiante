@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.example.demo.entity.AccountEntity;
 import com.example.demo.enums.AccountType;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
@@ -13,6 +14,7 @@ public final class AuthDto {
 
     private AuthDto() {}
 
+    @Schema(name = "LoginRequest")
     public record LoginRequest(
             @NotBlank(message = "Email is required")
             @Email(message = "Invalid email format")
@@ -22,6 +24,7 @@ public final class AuthDto {
             String password
     ) {}
 
+    @Schema(name = "AccountResponse")
     public record AccountResponse(
             UUID id,
             String firstName,
@@ -43,6 +46,7 @@ public final class AuthDto {
         }
     }
 
+    @Schema(name = "AuthResponse")
     public record Response(
             String token,
             AccountResponse user

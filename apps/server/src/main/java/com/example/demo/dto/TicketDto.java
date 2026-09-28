@@ -10,6 +10,7 @@ import com.example.demo.enums.TicketCategory;
 import com.example.demo.enums.TicketPriority;
 import com.example.demo.enums.TicketStatus;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -19,6 +20,7 @@ public final class TicketDto {
     private TicketDto() {
     }
 
+    @Schema(name = "TicketCreateRequest")
     public record CreateRequest(
             @NotBlank(message = "Title is required")
             @Size(max = 255, message = "Title must not exceed 255 characters")
@@ -31,6 +33,7 @@ public final class TicketDto {
 
     }
 
+    @Schema(name = "TicketStatusUpdateRequest")
     public record StatusUpdateRequest(
             @NotNull(message = "Status is required")
             TicketStatus status,
@@ -40,6 +43,7 @@ public final class TicketDto {
 
     }
 
+    @Schema(name = "TicketResponse")
     public record Response(
             UUID id,
             String title,

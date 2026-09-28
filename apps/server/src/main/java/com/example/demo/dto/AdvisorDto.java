@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.example.demo.entity.AdvisorEntity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,6 +16,7 @@ public final class AdvisorDto {
 
     private AdvisorDto() {}
 
+    @Schema(name = "AdvisorCreateRequest")
     public record CreateRequest(
             @NotBlank(message = "First name is required")
             @Size(max = 50, message = "First name must not exceed 50 characters")
@@ -41,11 +43,13 @@ public final class AdvisorDto {
             Integer maxConcurrentTickets
     ) {}
 
+    @Schema(name = "AdvisorAvailabilityRequest")
     public record AvailabilityRequest(
             @NotNull(message = "Availability status is required")
             Boolean isAvailable
     ) {}
 
+    @Schema(name = "AdvisorResponse")
     public record Response(
             UUID id,
             String firstName,
