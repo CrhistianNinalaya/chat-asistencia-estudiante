@@ -22,6 +22,9 @@
     },
     "build": {
       "executor": "nx:run-commands",
+      "dependsOn": ["test"],
+      "cache": true,
+      "outputs": ["{projectRoot}/target"],
       "options": {
         "command": "./mvnw clean package -DskipTests",
         "cwd": "apps/server",
@@ -30,6 +33,7 @@
     },
     "test": {
       "executor": "nx:run-commands",
+      "cache": true,
       "options": {
         "command": "./mvnw test",
         "cwd": "apps/server",

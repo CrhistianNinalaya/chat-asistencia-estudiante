@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Skip checks when deleting a remote branch (local sha is all zeroes)
+zero="0000000000000000000000000000000000000000"
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ "$local_sha" = "$zero" ]; then
+    exit 0
+  fi
+done
+
+echo "🔍 Running pre-push checks on affected projects..."
+
+BASE_REF="origin/main"
+if ! git rev-parse --verify "$BASE_REF" >/dev/null 2>&1; then
+  BASE_REF="HEAD~1"
+fi
+
+pnpm nx affected -t test build --base="$BASE_REF"

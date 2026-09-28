@@ -6,7 +6,8 @@
     "dev:server": "nx serve server",
     "debug:server": "nx serve-debug server",
     "build:server": "nx build server",
-    "test:server": "nx test server"
+    "test:server": "nx test server",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "Crhistian Ninalaya",
@@ -15,6 +16,7 @@
   "devDependencies": {
     "@nx/react": "^23.2.1",
     "@nx/vite": "^23.2.1",
+    "husky": "^9.1.7",
     "nx": "23.2.1"
   }
 }
