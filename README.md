@@ -197,7 +197,7 @@ pnpm dev:server
 O directamente desde `apps/server`:
 ```bash
 cd apps/server
-./mvnw spring-boot:run
+./gradlew bootRun
 ```
 
 ### 5. Inspección del Monorepo y Proyectos Afectados con Nx

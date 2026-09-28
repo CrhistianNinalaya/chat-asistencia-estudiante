@@ -7,7 +7,7 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "./mvnw spring-boot:run",
+        "command": "./gradlew bootRun",
         "cwd": "apps/server",
         "envFile": ".env"
       }
@@ -15,7 +15,7 @@
     "serve-debug": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "./mvnw spring-boot:run -Dspring-boot.run.jvmArguments=\"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005\"",
+        "command": "./gradlew bootRun --debug-jvm",
         "cwd": "apps/server",
         "envFile": ".env"
       }
@@ -24,9 +24,9 @@
       "executor": "nx:run-commands",
       "dependsOn": ["test"],
       "cache": true,
-      "outputs": ["{projectRoot}/target"],
+      "outputs": ["{projectRoot}/build/libs"],
       "options": {
-        "command": "./mvnw clean package -DskipTests",
+        "command": "./gradlew bootJar",
         "cwd": "apps/server",
         "envFile": ".env"
       }
@@ -34,8 +34,9 @@
     "test": {
       "executor": "nx:run-commands",
       "cache": true,
+      "outputs": ["{projectRoot}/build/reports/tests"],
       "options": {
-        "command": "./mvnw test",
+        "command": "./gradlew test",
         "cwd": "apps/server",
         "envFile": ".env"
       }
