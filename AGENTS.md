@@ -54,6 +54,7 @@ This repository (`chat-asistencia-estudiante`) adheres to strict quality, archit
 - **Service-Level Authorization:** Always enforce ownership and role checks inside service methods (e.g., students can only view or message their own tickets; advisors access assigned or unassigned tickets).
 - **Domain Naming Consistency:** Use `ticketId` consistently across all layers, entities, repositories, and STOMP topics (e.g., `/topic/tickets/{ticketId}`). Never use legacy `chatId` or `/topic/chat/...`.
 - **Reusable Abstractions:** Extract common lookup and authorization checks (such as `getTicketOrThrow`, `getAccountOrThrow`, `validateStudentOwnership`) into private helpers rather than repeating boilerplate.
+- **Strict Environment Variables (No Defaults in application.properties or @Value):** Never hardcode default/fallback values (such as `${VAR:default}`) in `application.properties` or Spring `@Value` annotations. All configuration values MUST be strictly sourced from environment variables (`.env`), and documented in `.env.example`. If a variable is missing, the application must fail fast at startup rather than falling back silently to hardcoded values.
 
 ---
 
