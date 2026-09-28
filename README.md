@@ -115,6 +115,7 @@ components/
 - **Estilos:** Pure CSS Modules (`*.module.css`) nativo
 - **Testing:** Vitest / React Testing Library
 - **Conectividad:** Axios / Fetch API & `@stomp/stompjs` + `sockjs-client`
+- **Tipado API:** `openapi-typescript` (generación automática de contratos vía `pnpm codegen:api`)
 - **Hosting:** Vercel (CI/CD automático)
 
 ### Backend (`apps/server`)
@@ -123,8 +124,9 @@ components/
   - `spring-boot-starter-web` (APIs RESTful)
   - `spring-boot-starter-data-jpa` (Persistencia ORM Jakarta EE)
   - `spring-boot-starter-websocket` (Mensajería STOMP en tiempo real)
+  - `springdoc-openapi-starter-webmvc-ui` (Documentación OpenAPI 3 / Swagger UI)
 - **Base de Datos:** MySQL 8.0+ / Driver oficial `mysql-connector-j`
-- **Gestión de Entorno:** SDKMAN, Apache Maven & Nx
+- **Build & Monorepo:** Gradle 9.8.0, SDKMAN & Nx
 
 ---
 
@@ -173,10 +175,15 @@ components/
   ```
 - **Docker** o **MySQL 8** en ejecución.
 
-### 2. Variables de Entorno del Backend
-Copia el archivo `.env.example` como `.env` dentro de `apps/server/` y ajusta tus credenciales locales:
+### 2. Variables de Entorno (Backend y Frontend)
+Copia las plantillas de variables de entorno y ajusta tus credenciales locales:
+
 ```bash
+# Backend (Spring Boot / MySQL / JWT)
 cp apps/server/.env.example apps/server/.env
+
+# Frontend (API URL / WebSocket Endpoint)
+cp apps/client/.env.example apps/client/.env
 ```
 
 ### 3. Base de Datos en Contenedor (Docker)
@@ -199,8 +206,22 @@ O directamente desde `apps/server`:
 cd apps/server
 ./gradlew bootRun
 ```
+*Una vez activo, el contrato OpenAPI estará disponible en `http://localhost:8080/v3/api-docs` y la UI interactiva en `http://localhost:8080/swagger-ui.html`.*
 
-### 5. Inspección del Monorepo y Proyectos Afectados con Nx
+### 5. Generación de Tipos TypeScript (OpenAPI Codegen)
+Con el backend en ejecución, genera o sincroniza automáticamente los contratos tipados para el frontend en `apps/client/src/api/generated/api-schema.ts`:
+```bash
+pnpm codegen:api
+```
+*(Si el backend no está activo o no responde, el script informará la causa detallada y los pasos para iniciarlo).*
+
+### 6. Ejecución del Frontend con Nx
+Para iniciar el cliente en modo desarrollo con Vite:
+```bash
+pnpm dev:client
+```
+
+### 7. Inspección del Monorepo y Proyectos Afectados con Nx
 
 - **Visualizar el Grafo de Dependencias (Servidor Web Interactivo):**
   ```bash
@@ -232,8 +253,9 @@ cd apps/server
 - [x] Integración de mensajería en tiempo real con WebSockets (STOMP).
 - [x] Configuración de espacio de trabajo **Monorepo con Nx**.
 - [x] Actualización de dependencias a **Spring Boot 4.1.1 + Jakarta EE + Java 25 LTS**.
+- [x] Migración del sistema de construcción backend a **Gradle 9.8.0**.
 - [x] Refactorización completa de base de datos y backend al inglés.
+- [x] Documentación interactiva con **OpenAPI / Swagger UI** (`springdoc-openapi`) y script de sincronización de contratos TypeScript (`pnpm codegen:api`).
 - [ ] Creación de aplicación **React en `apps/client`** (Vite + CSS Modules nativo + STOMP client + Vitest).
 - [ ] Implementación de **Spring Security 6 con JWT** para autenticación segura sin estado.
-- [ ] Documentación interactiva con **OpenAPI / Swagger UI** (`springdoc-openapi`).
 - [ ] Despliegue de Frontend en **Vercel** y Backend en la nube con pipeline CI/CD en **GitHub Actions**.
