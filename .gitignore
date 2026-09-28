@@ -61,6 +61,12 @@ node_modules/
 .nx/workspace-data
 .nx/migrate-runs
 
+### Frontend / Vite Build ###
+dist/
+**/dist/
+out-tsc/
+**/out-tsc/
+
 ### Gradle ###
 .gradle/
 build/
