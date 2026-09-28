@@ -10,6 +10,7 @@ This repository (`chat-asistencia-estudiante`) adheres to strict quality, archit
 - **AAA Testing Comments Exception:** In test files, explicitly delineate the structure of every test using simple section markers where each phase begins: `// Arrange`, `// Act`, and `// Assert` (or `// Act & Assert` for MockMvc chained assertions).
 - **SonarQube S108 Empty Block Comment Exception:** When a block or `switch` branch is intentionally a no-op (e.g., an intentional no-op branch for a role like `ADMIN` requiring no validation), an explanatory English comment is explicitly allowed inside the block to satisfy SonarQube `java:S108` (e.g., `// Intentionally empty: admins have unrestricted read access`).
 - **Strict English Everywhere:** 100% of all code must be written in English. This applies to identifiers, classes, methods, variables, exception types, exception messages, validation constraint messages, logs, tests, and git commit messages.
+- **Explicit Top-Level Imports (No Inline FQCN):** Always declare explicit `import` statements at the top of the file rather than using fully qualified class names inline within method signatures or bodies (e.g., declare `import java.util.Collections;` and call `Collections.emptyList()`, never `java.util.Collections.emptyList()`). Keep code idiomatic and readable.
 - **Self-Documenting Code:** Rely on descriptive domain terminology rather than explanatory comments.
 
 ---
@@ -38,6 +39,10 @@ This repository (`chat-asistencia-estudiante`) adheres to strict quality, archit
 - **Rule Switch (`->`):** Use arrow syntax with pattern matching for `switch` expressions and statements.
 - **No Empty Blocks (`java:S108`):** Never leave catch or branch blocks completely empty without explanation. If a branch or catch block is intentionally a no-op, always include an explanatory English comment explaining why no action is needed to satisfy SonarQube.
 - **No Unused Variables (`java:S1481`):** Eliminate unread pattern variables and unused locals.
+- **No Unnecessary Imports (`java:S1128`):** Maintain strictly clean imports. Proactively remove any unused, redundant, or orphaned import statements when creating or modifying files.
+- **Cognitive Complexity <= 15 (`java:S3776`):** Keep method cognitive complexity strictly at or below 15. Proactively decompose multi-step logic (such as validations, authorization checks, and state transitions) into focused private helper methods.
+- **No Redundant Matchers in Tests (`java:S6068`):** In Mockito `verify` or `when` invocations, pass literal or exact value arguments directly without redundant `eq(...)` wrappers unless mixed with argument matchers.
+- **Final Test Fixture Fields:** In test classes, declare shared mock fixtures and static test principals as `final` (e.g., `private final UserPrincipal testUser = ...`).
 - **Immutable DTOs:** Use Java `record` for all DTOs and request/response payloads.
 - **Built-in Clamping:** Use `Math.clamp(value, min, max)` for numerical bounding.
 

@@ -20,6 +20,7 @@ import com.example.demo.entity.AdvisorEntity;
 import com.example.demo.entity.MessageEntity;
 import com.example.demo.entity.StudentEntity;
 import com.example.demo.entity.TicketEntity;
+import com.example.demo.enums.TicketStatus;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.MessageRepository;
 import com.example.demo.repository.TicketRepository;
@@ -146,6 +147,9 @@ public class MessageServiceImpl implements MessageService {
     private void assignAdvisorIfNeeded(TicketEntity ticket, AdvisorEntity advisor) {
         if (ticket.getAssignedTo() == null) {
             ticket.setAssignedTo(advisor);
+            if (ticket.getStatus() == TicketStatus.OPEN) {
+                ticket.setStatus(TicketStatus.IN_PROGRESS);
+            }
             ticketRepository.save(ticket);
         } else if (!ticket.getAssignedTo().getId().equals(advisor.getId())) {
             throw new AccessDeniedException("Advisors cannot send messages to tickets assigned to another advisor");

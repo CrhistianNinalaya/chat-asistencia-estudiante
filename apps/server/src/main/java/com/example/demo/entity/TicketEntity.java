@@ -4,8 +4,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.example.demo.enums.ResolutionCategory;
 import com.example.demo.enums.TicketCategory;
 import com.example.demo.enums.TicketPriority;
+import com.example.demo.enums.TicketStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,12 +56,21 @@ public class TicketEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "generated_by", nullable = false)
     private StudentEntity generatedBy;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_to")
     private AdvisorEntity assignedTo;
 
-    @Column(name = "active", nullable = false)
-    private boolean active = true;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 30)
+    private TicketStatus status = TicketStatus.OPEN;
+
+    @Column(name = "resolution_summary", columnDefinition = "TEXT")
+    private String resolutionSummary;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "resolution_category", length = 50)
+    private ResolutionCategory resolutionCategory;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false, length = 20)
@@ -67,6 +78,11 @@ public class TicketEntity {
 
     public static final long LOW_PRIORITY_MAX_DAYS = 2L;
     public static final long MEDIUM_PRIORITY_MAX_DAYS = 4L;
+
+    @Transient
+    public boolean isActive() {
+        return this.status != TicketStatus.RESOLVED && this.status != TicketStatus.CLOSED;
+    }
 
     @Transient
     public TicketPriority getPriority() {
@@ -86,6 +102,9 @@ public class TicketEntity {
     protected void onCreate() {
         if (this.startedAt == null) {
             this.startedAt = Instant.now();
+        }
+        if (this.status == null) {
+            this.status = TicketStatus.OPEN;
         }
     }
 }
