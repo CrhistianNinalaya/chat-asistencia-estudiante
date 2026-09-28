@@ -200,6 +200,30 @@ cd apps/server
 ./mvnw spring-boot:run
 ```
 
+### 5. Inspección del Monorepo y Proyectos Afectados con Nx
+
+- **Visualizar el Grafo de Dependencias (Servidor Web Interactivo):**
+  ```bash
+  pnpm nx graph
+  ```
+  *Abre una interfaz gráfica interactiva en `http://127.0.0.1:4211` para explorar la arquitectura y dependencias entre aplicaciones y librerías.*
+
+  Para resaltar visualmente solo los proyectos afectados por cambios locales:
+  ```bash
+  pnpm nx graph --affected --base=origin/main
+  ```
+
+- **Listar Proyectos Afectados en Terminal:**
+  ```bash
+  pnpm nx show projects --affected --base=origin/main
+  ```
+  *Imprime directamente en consola los proyectos con cambios respecto a `origin/main` (reemplazo oficial de `print-affected`).*
+
+- **Ejecutar Tests y Build de Proyectos Afectados (con Cache):**
+  ```bash
+  pnpm nx affected -t test build --base=origin/main
+  ```
+
 ---
 
 ## 🗺️ Roadmap de Evolución
