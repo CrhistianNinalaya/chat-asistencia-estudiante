@@ -9,7 +9,7 @@
       "options": {
         "command": "./gradlew bootRun",
         "cwd": "apps/server",
-        "envFile": ".env"
+        "envFile": "apps/server/.env"
       }
     },
     "serve-debug": {
@@ -17,7 +17,7 @@
       "options": {
         "command": "./gradlew bootRun --debug-jvm",
         "cwd": "apps/server",
-        "envFile": ".env"
+        "envFile": "apps/server/.env"
       }
     },
     "build": {
@@ -28,7 +28,7 @@
       "options": {
         "command": "./gradlew bootJar",
         "cwd": "apps/server",
-        "envFile": ".env"
+        "envFile": "apps/server/.env"
       }
     },
     "test": {
@@ -38,7 +38,7 @@
       "options": {
         "command": "./gradlew test",
         "cwd": "apps/server",
-        "envFile": ".env"
+        "envFile": "apps/server/.env"
       }
     }
   }

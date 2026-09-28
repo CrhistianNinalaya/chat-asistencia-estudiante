@@ -173,10 +173,10 @@ components/
   ```
 - **Docker** o **MySQL 8** en ejecución.
 
-### 2. Variables de Entorno
-Copia el archivo `.env.example` como `.env` en la raíz del proyecto y ajusta tus credenciales:
+### 2. Variables de Entorno del Backend
+Copia el archivo `.env.example` como `.env` dentro de `apps/server/` y ajusta tus credenciales locales:
 ```bash
-cp .env.example .env
+cp apps/server/.env.example apps/server/.env
 ```
 
 ### 3. Base de Datos en Contenedor (Docker)

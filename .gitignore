@@ -49,9 +49,11 @@ build/
 .DS_Store
 Thumbs.db
 *.tmp
-*.bak
+**/node_modules/
+node_modules/
 .env
-node_modules
+.env.*
+!.env.example
 
 
 
