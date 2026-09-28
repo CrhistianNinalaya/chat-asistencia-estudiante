@@ -2,6 +2,7 @@
   "recommendations": [
     "vscjava.vscode-java-pack",
     "vmware.vscode-spring-boot",
-    "nrwl.angular-console"
+    "nrwl.angular-console",
+    "dbaeumer.vscode-eslint"
   ]
 }

@@ -66,3 +66,5 @@ node_modules/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
+vite.config.*.timestamp*
+vitest.config.*.timestamp*
