@@ -1,6 +1,7 @@
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import process from 'node:process';
 
 const ROOT_DIR: string = resolve(import.meta.dirname, '../..');
 const SERVER_DIR: string = resolve(ROOT_DIR, 'apps/server');

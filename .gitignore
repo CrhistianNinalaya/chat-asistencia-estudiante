@@ -51,6 +51,7 @@ Thumbs.db
 *.tmp
 **/node_modules/
 node_modules/
+*.tsbuildinfo
 .env
 .env.*
 !.env.example
