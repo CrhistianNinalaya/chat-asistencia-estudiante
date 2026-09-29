@@ -16,6 +16,9 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["chat-asistencia-estudiante"]
+    "customConditions": ["chat-asistencia-estudiante"],
+    "paths": {
+      "@/*": ["./apps/client/src/*"]
+    }
   }
 }

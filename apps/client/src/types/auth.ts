@@ -1,4 +1,4 @@
-import type { components } from '../api/generated/api-schema';
+import type { components } from '@/api/generated/api-schema';
 
 export type Account = components['schemas']['AccountResponse'];
 export type AccountType = NonNullable<Account['accountType']>;

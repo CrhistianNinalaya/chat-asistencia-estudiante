@@ -25,7 +25,8 @@ export default [
                 {
                     enforceBuildableLibDependency: true,
                     allow: [
-                        "^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$"
+                        String.raw`(^|[/\\])eslint(\.base)?\.config\.[cm]?[jt]s$`,
+                        "^@/"
                     ],
                     depConstraints: [
                         {
@@ -42,15 +43,16 @@ export default [
     {
         files: [
             "**/*.ts",
-            "**/*.tsx",
-            "**/*.cts",
-            "**/*.mts",
-            "**/*.js",
-            "**/*.jsx",
-            "**/*.cjs",
-            "**/*.mjs"
+            "**/*.tsx"
         ],
-        // Override or add rules here
-        rules: {}
+        languageOptions: {
+            parserOptions: {
+                projectService: true,
+                tsconfigRootDir: import.meta.dirname,
+            }
+        },
+        rules: {
+            "@typescript-eslint/prefer-optional-chain": "error"
+        }
     }
 ];

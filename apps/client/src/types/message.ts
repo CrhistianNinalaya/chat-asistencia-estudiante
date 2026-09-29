@@ -1,4 +1,4 @@
-import type { components } from '../api/generated/api-schema';
+import type { components } from '@/api/generated/api-schema';
 
 export type Message = components['schemas']['MessageResponse'];
 export type SendMessagePayload = components['schemas']['MessageSendRequest'];

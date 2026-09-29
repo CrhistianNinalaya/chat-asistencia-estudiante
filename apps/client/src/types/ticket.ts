@@ -1,4 +1,4 @@
-import type { components } from '../api/generated/api-schema';
+import type { components } from '@/api/generated/api-schema';
 
 export type Ticket = components['schemas']['TicketResponse'];
 export type TicketStatus = NonNullable<Ticket['status']>;
