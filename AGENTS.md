@@ -11,6 +11,8 @@ This repository (`chat-asistencia-estudiante`) adheres to strict quality, archit
 - **SonarQube S108 Empty Block Comment Exception:** When a block or `switch` branch is intentionally a no-op (e.g., an intentional no-op branch for a role like `ADMIN` requiring no validation), an explanatory English comment is explicitly allowed inside the block to satisfy SonarQube `java:S108` (e.g., `// Intentionally empty: admins have unrestricted read access`).
 - **Strict English Everywhere:** 100% of all code must be written in English. This applies to identifiers, classes, methods, variables, exception types, exception messages, validation constraint messages, logs, tests, and git commit messages.
 - **Explicit Top-Level Imports (No Inline FQCN):** Always declare explicit `import` statements at the top of the file rather than using fully qualified class names inline within method signatures or bodies (e.g., declare `import java.util.Collections;` and call `Collections.emptyList()`, never `java.util.Collections.emptyList()`). Keep code idiomatic and readable.
+- **Prefer Optional Chaining (`?.`) Over Chained Logical Expressions:** Always prefer using an optional chain expression instead, as it's more concise and easier to read. Never write chained logical AND expressions or redundant fallback checks such as `foo && foo.bar`, `!val || !val.trim()`, or `contentType && contentType.includes(...)`. Instead, always write `foo?.bar`, `!val?.trim()`, and `contentType?.includes(...)`. This invariant applies across all TypeScript files in the workspace and is strictly enforced by `@typescript-eslint/prefer-optional-chain`.
+- **Object Parameter for Methods with More Than 2 Parameters:** Whenever a function, method, or constructor requires more than 2 parameters (> 2, i.e., 3 or more), declare it using a single options object with destructured properties (e.g., `function test({ a, b, c }: TestOptions)` instead of `function test(a, b, c)`). Functions or methods requiring 1 or 2 parameters may remain positional. This eliminates positional argument confusion and makes call sites clear and self-documenting.
 - **Self-Documenting Code:** Rely on descriptive domain terminology rather than explanatory comments.
 
 ---
@@ -77,4 +79,13 @@ This repository (`chat-asistencia-estudiante`) adheres to strict quality, archit
 - **Planned Deployment Topology (Primary Target):** The primary and most probable deployment targets are Vercel (Frontend) and Oracle Cloud Infrastructure / OCI Always Free (Backend). Runtime connectivity is governed strictly through client environment variables (`VITE_API_URL` and `VITE_WS_URL`) with CORS properly configured.
 - **Domain Layer Isolation:** UI components, hooks, and services must NEVER import directly from `api-schema.ts` (e.g., `components['schemas']['...']`). All consuming code must import from the domain types layer in `apps/client/src/types/` (`Ticket`, `TicketStatus`, `TICKET_STATUS`), preserving decoupling and clean architecture.
 - **Schema Naming Invariant:** Every backend DTO record exposed via REST must be explicitly annotated with `@Schema(name = "...")` to prevent simple-name collisions (such as multiple inner `Response` or `CreateRequest` records) during OpenAPI schema generation.
+
+---
+
+## 8. Frontend Testing Standards (Pure Logic & .test.ts Only)
+
+- **Strictly Zero `.tsx` Tests:** Never create or maintain unit tests for React components (`*.test.tsx`, `*.spec.tsx`). Visual rendering tests are strictly prohibited.
+- **Pure Functions & Utilities Only (`*.test.ts`):** Automated frontend testing is strictly reserved for pure business logic, validators, formatters, and utility functions in TypeScript (`*.test.ts`).
+- **Colocalized Sibling Tests:** Every utility or pure domain logic file (e.g. `[name].ts`) in `utils/` must have its sibling test file `[name].test.ts` alongside it.
+- **Vitest Scope Locking:** The test runner configuration in `apps/client/vite.config.mts` is permanently locked to `include: ['src/**/*.test.ts']`.
 
