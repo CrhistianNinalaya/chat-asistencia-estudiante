@@ -12,12 +12,15 @@ import jakarta.validation.constraints.NotBlank;
 
 public final class AuthDto {
 
+    public static final String EMAIL_PATTERN = "^[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\\.){1,8}[a-zA-Z]{2,24}$";
+
+
     private AuthDto() {}
 
     @Schema(name = "LoginRequest")
     public record LoginRequest(
             @NotBlank(message = "Email is required")
-            @Email(message = "Invalid email format")
+            @Email(regexp = EMAIL_PATTERN, message = "Invalid email format")
             String email,
 
             @NotBlank(message = "Password is required")

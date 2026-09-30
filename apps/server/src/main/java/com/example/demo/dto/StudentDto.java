@@ -28,7 +28,7 @@ public final class StudentDto {
             String lastName,
 
             @NotBlank(message = "Email is required")
-            @Email(message = "Invalid email format")
+            @Email(regexp = AuthDto.EMAIL_PATTERN, message = "Invalid email format")
             @Size(max = 100, message = "Email must not exceed 100 characters")
             String email,
 
