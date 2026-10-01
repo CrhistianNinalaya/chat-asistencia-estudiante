@@ -1,15 +1,7 @@
-// Uncomment this line to use CSS modules
-// import styles from './app.module.css';
-import NxWelcome from "./nx-welcome";
+import { AppRouter } from '@/routes/AppRouter';
 
 export function App() {
-  return (
-    <div>
-      <NxWelcome title="client"/>
-    </div>
-  );
+  return <AppRouter />;
 }
 
 export default App;
-
-

@@ -1,0 +1,16 @@
+.card {
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-8);
+  transition: box-shadow var(--transition-normal), border-color var(--transition-normal);
+}
+
+.bordered {
+  border-color: var(--color-border);
+}
+
+.elevated {
+  box-shadow: var(--shadow-lg);
+}

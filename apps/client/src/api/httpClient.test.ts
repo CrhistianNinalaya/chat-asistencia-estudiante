@@ -294,7 +294,7 @@ describe('httpClient', () => {
       // Act & Assert
       await expect(httpClient.get('/tickets')).rejects.toMatchObject({
         status: 500,
-        message: 'HTTP error 500: Internal Server Error',
+        message: 'Internal Server Error',
       });
     });
 
@@ -313,7 +313,85 @@ describe('httpClient', () => {
       // Act & Assert
       await expect(httpClient.get('/tickets')).rejects.toMatchObject({
         status: 502,
-        message: 'HTTP error 502: Bad Gateway',
+        message: 'Bad Gateway',
+      });
+    });
+
+    it('should parse error detail when content-type is application/problem+json', async () => {
+      // Arrange
+      const problemDetail = {
+        title: 'Unauthorized',
+        status: 401,
+        detail: 'Invalid credentials',
+        instance: '/api/auth/login',
+      };
+      mockFetch.mockResolvedValueOnce(
+        createMockResponse({
+          status: 401,
+          statusText: 'Unauthorized',
+          ok: false,
+          contentType: 'application/problem+json',
+          data: problemDetail,
+        })
+      );
+
+      // Act & Assert
+      await expect(
+        httpClient.post({ endpoint: '/auth/login', body: { email: 'a@b.com', password: 'wrong' } })
+      ).rejects.toMatchObject({
+        status: 401,
+        message: 'Invalid credentials',
+        data: problemDetail,
+      });
+    });
+
+    it('should extract detail from stringified JSON error payload', async () => {
+      // Arrange
+      const stringifiedJson = JSON.stringify({
+        title: 'Unauthorized',
+        status: 401,
+        detail: 'Invalid credentials',
+      });
+      mockFetch.mockResolvedValueOnce(
+        createMockResponse({
+          status: 401,
+          statusText: '',
+          ok: false,
+          contentType: 'text/plain',
+          data: stringifiedJson,
+        })
+      );
+
+      // Act & Assert
+      await expect(
+        httpClient.post({ endpoint: '/auth/login', body: { email: 'a@b.com', password: 'wrong' } })
+      ).rejects.toMatchObject({
+        status: 401,
+        message: 'Invalid credentials',
+        data: {
+          title: 'Unauthorized',
+          status: 401,
+          detail: 'Invalid credentials',
+        },
+      });
+    });
+
+    it('should format fallback error without trailing colon when statusText is empty', async () => {
+      // Arrange
+      mockFetch.mockResolvedValueOnce(
+        createMockResponse({
+          status: 401,
+          statusText: '',
+          ok: false,
+          contentType: 'text/html',
+          data: '<html>401</html>',
+        })
+      );
+
+      // Act & Assert
+      await expect(httpClient.get('/tickets')).rejects.toMatchObject({
+        status: 401,
+        message: 'An unexpected error occurred. Please try again.',
       });
     });
   });

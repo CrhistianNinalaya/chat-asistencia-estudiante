@@ -62,6 +62,40 @@
   --color-priority-medium: #f59e0b;
   --color-priority-high: #dc2626;
 
+  /* --- Feedback Alerts (Status Codes & Feedback) --- */
+  --color-alert-info-bg: rgba(2, 132, 199, 0.1);
+  --color-alert-info-border: rgba(2, 132, 199, 0.3);
+  --color-alert-info-text: var(--color-status-open);
+
+  --color-alert-success-bg: rgba(22, 163, 74, 0.1);
+  --color-alert-success-border: rgba(22, 163, 74, 0.3);
+  --color-alert-success-text: var(--color-status-resolved);
+
+  --color-alert-error-bg: rgba(220, 38, 38, 0.1);
+  --color-alert-error-border: rgba(220, 38, 38, 0.3);
+  --color-alert-error-text: var(--color-priority-high);
+
+  /* --- Badges & Role Pills (WCAG AAA >= 7:1) --- */
+  --color-badge-advisor-bg: rgba(99, 102, 241, 0.12);
+  --color-badge-advisor-border: rgba(99, 102, 241, 0.3);
+  --color-badge-advisor-text: #3730a3;
+
+  --color-badge-student-bg: rgba(2, 132, 199, 0.12);
+  --color-badge-student-border: rgba(2, 132, 199, 0.3);
+  --color-badge-student-text: #075985;
+
+  --color-badge-admin-bg: rgba(147, 51, 234, 0.12);
+  --color-badge-admin-border: rgba(147, 51, 234, 0.3);
+  --color-badge-admin-text: #581c87;
+
+  --color-badge-primary-bg: rgba(0, 66, 102, 0.1);
+  --color-badge-primary-border: rgba(0, 66, 102, 0.25);
+  --color-badge-primary-text: #004266;
+
+  --color-badge-neutral-bg: var(--color-surface-hover);
+  --color-badge-neutral-border: var(--color-border);
+  --color-badge-neutral-text: var(--color-text-secondary);
+
   /* ===============================================================
    * Semantic Theme: LIGHT MODE (Default)
    * =============================================================== */
@@ -138,6 +172,40 @@
   --chat-bubble-incoming-text: #e9f3f7;
   --chat-bubble-outgoing-bg: var(--color-brand);
   --chat-bubble-outgoing-text: var(--color-brand-contrast);
+
+  /* Feedback Alerts (Dark) */
+  --color-alert-info-bg: rgba(2, 132, 199, 0.15);
+  --color-alert-info-border: rgba(2, 132, 199, 0.4);
+  --color-alert-info-text: #38bdf8;
+
+  --color-alert-success-bg: rgba(22, 163, 74, 0.15);
+  --color-alert-success-border: rgba(22, 163, 74, 0.4);
+  --color-alert-success-text: #4ade80;
+
+  --color-alert-error-bg: rgba(220, 38, 38, 0.15);
+  --color-alert-error-border: rgba(220, 38, 38, 0.4);
+  --color-alert-error-text: #f87171;
+
+  /* Badges (Dark Mode - WCAG AAA >= 7:1) */
+  --color-badge-advisor-bg: rgba(99, 102, 241, 0.18);
+  --color-badge-advisor-border: rgba(99, 102, 241, 0.4);
+  --color-badge-advisor-text: #a5b4fc;
+
+  --color-badge-student-bg: rgba(2, 132, 199, 0.18);
+  --color-badge-student-border: rgba(2, 132, 199, 0.4);
+  --color-badge-student-text: #7dd3fc;
+
+  --color-badge-admin-bg: rgba(168, 85, 247, 0.18);
+  --color-badge-admin-border: rgba(168, 85, 247, 0.4);
+  --color-badge-admin-text: #d8b4fe;
+
+  --color-badge-primary-bg: rgba(92, 177, 222, 0.15);
+  --color-badge-primary-border: rgba(92, 177, 222, 0.35);
+  --color-badge-primary-text: #bae6fd;
+
+  --color-badge-neutral-bg: var(--color-surface-hover);
+  --color-badge-neutral-border: var(--color-border);
+  --color-badge-neutral-text: var(--color-text-secondary);
 }
 
 /* Automatic Dark Mode Fallback when user prefers dark and no data-theme override is present */
@@ -172,5 +240,38 @@
     --chat-bubble-incoming-text: #e9f3f7;
     --chat-bubble-outgoing-bg: var(--color-brand);
     --chat-bubble-outgoing-text: var(--color-brand-contrast);
+
+    --color-alert-info-bg: rgba(2, 132, 199, 0.15);
+    --color-alert-info-border: rgba(2, 132, 199, 0.4);
+    --color-alert-info-text: #38bdf8;
+
+    --color-alert-success-bg: rgba(22, 163, 74, 0.15);
+    --color-alert-success-border: rgba(22, 163, 74, 0.4);
+    --color-alert-success-text: #4ade80;
+
+    --color-alert-error-bg: rgba(220, 38, 38, 0.15);
+    --color-alert-error-border: rgba(220, 38, 38, 0.4);
+    --color-alert-error-text: #f87171;
+
+    /* Badges (Dark Mode - WCAG AAA >= 7:1) */
+    --color-badge-advisor-bg: rgba(99, 102, 241, 0.18);
+    --color-badge-advisor-border: rgba(99, 102, 241, 0.4);
+    --color-badge-advisor-text: #a5b4fc;
+
+    --color-badge-student-bg: rgba(2, 132, 199, 0.18);
+    --color-badge-student-border: rgba(2, 132, 199, 0.4);
+    --color-badge-student-text: #7dd3fc;
+
+    --color-badge-admin-bg: rgba(168, 85, 247, 0.18);
+    --color-badge-admin-border: rgba(168, 85, 247, 0.4);
+    --color-badge-admin-text: #d8b4fe;
+
+    --color-badge-primary-bg: rgba(92, 177, 222, 0.15);
+    --color-badge-primary-border: rgba(92, 177, 222, 0.35);
+    --color-badge-primary-text: #bae6fd;
+
+    --color-badge-neutral-bg: var(--color-surface-hover);
+    --color-badge-neutral-border: var(--color-border);
+    --color-badge-neutral-text: var(--color-text-secondary);
   }
 }

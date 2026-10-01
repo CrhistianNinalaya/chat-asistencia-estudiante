@@ -39,13 +39,25 @@ const API_BASE_URL = sanitizeBaseUrl(import.meta.env.VITE_API_URL);
 
 interface ParseErrorMessageOptions {
   data: unknown;
-  status: number;
   statusText: string;
 }
 
-function parseErrorMessage({ data, status, statusText }: ParseErrorMessageOptions): string {
-  if (typeof data === 'object' && data !== null) {
-    const errorPayload = data as Record<string, unknown>;
+function tryParseJson(value: unknown): unknown {
+  if (typeof value !== 'string') {
+    return value;
+  }
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
+function parseErrorMessage({ data, statusText }: ParseErrorMessageOptions): string {
+  const payload = tryParseJson(data);
+
+  if (typeof payload === 'object' && payload !== null) {
+    const errorPayload = payload as Record<string, unknown>;
     if (typeof errorPayload.detail === 'string') {
       return errorPayload.detail;
     }
@@ -53,7 +65,16 @@ function parseErrorMessage({ data, status, statusText }: ParseErrorMessageOption
       return errorPayload.message;
     }
   }
-  return `HTTP error ${status}: ${statusText}`;
+
+  if (
+    typeof payload === 'string' &&
+    payload.trim().length > 0 &&
+    !payload.trim().startsWith('<')
+  ) {
+    return payload.trim();
+  }
+
+  return statusText || 'An unexpected error occurred. Please try again.';
 }
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
@@ -81,13 +102,13 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
   }
 
   const contentType = response.headers.get('content-type');
-  const isJson = Boolean(contentType?.includes('application/json'));
-  const data = isJson ? await response.json() : await response.text();
+  const isJson = Boolean(contentType?.includes('json'));
+  const rawData = isJson ? await response.json() : await response.text();
+  const data = tryParseJson(rawData);
 
   if (!response.ok) {
     const errorMessage = parseErrorMessage({
       data,
-      status: response.status,
       statusText: response.statusText,
     });
     throw new ApiError({
