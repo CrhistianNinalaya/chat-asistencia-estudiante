@@ -1,6 +1,6 @@
 import { useState, useEffect, type SyntheticEvent } from 'react';
 import { validateEmail, validatePassword } from '../utils/authValidators';
-import { useLogin } from './useLogin';
+import { useAuth } from '@/hooks/useAuth';
 
 export interface UseLoginFormOptions {
   initialEmail?: string;
@@ -11,7 +11,7 @@ export function useLoginForm({
   initialEmail = '',
   initialPassword = '',
 }: UseLoginFormOptions = {}) {
-  const { isLoading, serverError, serverStatus, clearServerError, login } = useLogin();
+  const { isLoading, serverError, serverStatus, clearServerError, login } = useAuth();
 
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState(initialPassword);

@@ -1,10 +1,10 @@
 import { Outlet, Link } from 'react-router-dom';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuth } from '@/hooks/useAuth';
 import { Badge, Button, Footer, ThemeToggle } from '@/components/ui';
 import styles from './AppLayout.module.css';
 
 export function AppLayout() {
-  const { isAuthenticated, user, logout } = useAuthStore();
+  const { isAuthenticated, user, logout, isLoading } = useAuth();
 
   const isStudent = user?.accountType === 'STUDENT';
   const roleBadgeVariant = isStudent ? 'student' : 'advisor';
@@ -31,7 +31,13 @@ export function AppLayout() {
                 {user.firstName} {user.lastName}
               </span>
               <Badge variant={roleBadgeVariant}>{roleLabel}</Badge>
-              <Button variant="outline" size="sm" onClick={logout}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={logout}
+                isLoading={isLoading}
+                disabled={isLoading}
+              >
                 Sign Out
               </Button>
             </div>

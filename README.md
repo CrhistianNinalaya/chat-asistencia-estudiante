@@ -266,6 +266,7 @@ pnpm codegen:api
 - [x] Migración del sistema de construcción backend a **Gradle 9.8.0**.
 - [x] Refactorización completa de base de datos y backend al inglés.
 - [x] Documentación interactiva con **OpenAPI / Swagger UI** (`springdoc-openapi`) y script de sincronización offline de contratos TypeScript (`pnpm codegen:api`).
-- [ ] Creación de aplicación **React en `apps/client`** (Vite + CSS Modules nativo + STOMP client + Vitest).
-- [ ] Implementación de **Spring Security 6 con JWT** para autenticación segura sin estado.
+- [x] Creación de aplicación **React en `apps/client`** (Vite + CSS Modules nativo + Zustand + React Router + Vitest).
+- [x] Implementación de **Spring Security 6 con JWT** para autenticación segura sin estado.
+- [ ] Integración en tiempo real con WebSockets (STOMP nativo sobre WS) y paginación por cursor en el cliente.
 - [ ] Despliegue en la nube previsto: Frontend en **Vercel** y Backend en **Oracle Cloud (OCI Always Free)** con pipeline CI/CD en **GitHub Actions**.

@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { httpClient, ApiError } from '@/api/httpClient';
+import { authApi } from '@/api/endpoints';
+import { ApiError } from '@/api/httpClient';
 import { useAuthStore } from '@/stores/authStore';
 import { getDefaultDashboardRoute } from '@/routes/utils/routeRoleUtils';
-import type { AuthResponse, LoginPayload } from '@/types';
+import { ROUTES } from '@/routes/paths';
+import type { LoginPayload } from '@/types';
 
-export function useLogin() {
+export function useAuth() {
   const navigate = useNavigate();
-  const setAuth = useAuthStore((state) => state.setAuth);
+  const { token, user, isAuthenticated, setAuth, logout: clearLocalAuth } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [serverStatus, setServerStatus] = useState<number | null>(null);
@@ -23,12 +25,9 @@ export function useLogin() {
     setServerStatus(null);
 
     try {
-      const response = await httpClient.post<AuthResponse>({
-        endpoint: '/auth/login',
-        body: {
-          email: email.trim(),
-          password,
-        },
+      const response = await authApi.login({
+        email: email.trim(),
+        password,
       });
 
       setAuth(response);
@@ -50,11 +49,28 @@ export function useLogin() {
     }
   };
 
+  const logout = async (): Promise<void> => {
+    setIsLoading(true);
+    try {
+      await authApi.logout();
+    } catch {
+      // Intentionally empty: clear local session even if backend logout request fails
+    } finally {
+      clearLocalAuth();
+      setIsLoading(false);
+      navigate(ROUTES.LOGIN, { replace: true });
+    }
+  };
+
   return {
+    token,
+    user,
+    isAuthenticated,
     isLoading,
     serverError,
     serverStatus,
     clearServerError,
     login,
+    logout,
   };
 }
