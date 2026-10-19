@@ -41,7 +41,7 @@ export function DemoCredentialsPicker({ onSelect }: Readonly<DemoCredentialsPick
             key={account.email}
             type="button"
             className={styles.demoCard}
-            onClick={() => onSelect(account.email, '123456')}
+            onClick={() => onSelect(account.email, 'password123')}
           >
             <Badge variant={account.role}>{account.roleLabel}</Badge>
             <span className={styles.demoName}>{account.name}</span>
