@@ -14,6 +14,13 @@ on:
           - 'frontend'
           - 'backend'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   detect:
     name: Detect Affected Projects
@@ -29,8 +36,6 @@ jobs:
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -43,8 +48,9 @@ jobs:
 
       - name: Evaluate deployment targets
         id: eval
+        env:
+          TARGET: ${{ github.event.inputs.target }}
         run: |
-          TARGET="${{ github.event.inputs.target }}"
           echo "Selected target: $TARGET"
 
           if [ "$TARGET" = "frontend" ]; then
@@ -57,17 +63,20 @@ jobs:
             echo "deploy_frontend=true" >> "$GITHUB_OUTPUT"
             echo "deploy_backend=true" >> "$GITHUB_OUTPUT"
           else
-            # Automatic detection using nx affected
-            AFFECTED=$(npx nx show projects --affected --base=HEAD~1 --head=HEAD || echo "")
+            BASE_REF="origin/main"
+            if ! git rev-parse --verify "$BASE_REF" >/dev/null 2>&1; then
+              BASE_REF="HEAD~1"
+            fi
+            AFFECTED=$(pnpm exec nx show projects --affected --base="$BASE_REF" --head=HEAD || echo "")
             echo "Affected projects: $AFFECTED"
 
-            if echo "$AFFECTED" | grep -q "client"; then
+            if echo "$AFFECTED" | grep -qw "client"; then
               echo "deploy_frontend=true" >> "$GITHUB_OUTPUT"
             else
               echo "deploy_frontend=false" >> "$GITHUB_OUTPUT"
             fi
 
-            if echo "$AFFECTED" | grep -q "server"; then
+            if echo "$AFFECTED" | grep -qw "server"; then
               echo "deploy_backend=true" >> "$GITHUB_OUTPUT"
             else
               echo "deploy_backend=false" >> "$GITHUB_OUTPUT"
@@ -83,32 +92,42 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24.11.0'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
       - name: Pull Vercel Environment Information
         working-directory: apps/client
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=production
         env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Build Project Artifacts
         working-directory: apps/client
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --prod
         env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Deploy Project Artifacts to Vercel
         working-directory: apps/client
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prebuilt --prod
         env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
@@ -130,15 +149,26 @@ jobs:
       - name: Sync server files to EC2
         run: |
           rsync -avz --delete \
+            --exclude '.env*' \
             --exclude 'node_modules' \
             --exclude '.git' \
             --exclude 'dist' \
             --exclude 'build' \
+            --exclude 'target' \
             --exclude '.gradle' \
-            -e "ssh -i ~/.ssh/ec2.pem -o StrictHostKeyChecking=no" \
+            -e "ssh -i ~/.ssh/ec2.pem -o StrictHostKeyChecking=accept-new" \
             apps/server/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/server/
 
       - name: Rebuild and restart server container
         run: |
-          ssh -i ~/.ssh/ec2.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+          ssh -i ~/.ssh/ec2.pem -o StrictHostKeyChecking=accept-new ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
             "cd ~/server && docker compose up -d --build"
+
+      - name: Verify server health
+        run: |
+          ssh -i ~/.ssh/ec2.pem -o StrictHostKeyChecking=accept-new ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+            "timeout 60 bash -c 'until curl -sf http://localhost:8080/actuator/health; do sleep 3; done'"
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/ec2.pem
