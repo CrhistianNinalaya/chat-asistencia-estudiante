@@ -1,0 +1,134 @@
+name: Manual Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Deployment Target'
+        required: true
+        default: 'auto'
+        type: choice
+        options:
+          - 'auto'
+          - 'all'
+          - 'frontend'
+          - 'backend'
+
+jobs:
+  detect:
+    name: Detect Affected Projects
+    runs-on: ubuntu-latest
+    outputs:
+      deploy_frontend: ${{ steps.eval.outputs.deploy_frontend }}
+      deploy_backend: ${{ steps.eval.outputs.deploy_backend }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Evaluate deployment targets
+        id: eval
+        run: |
+          TARGET="${{ github.event.inputs.target }}"
+          echo "Selected target: $TARGET"
+
+          if [ "$TARGET" = "frontend" ]; then
+            echo "deploy_frontend=true" >> "$GITHUB_OUTPUT"
+            echo "deploy_backend=false" >> "$GITHUB_OUTPUT"
+          elif [ "$TARGET" = "backend" ]; then
+            echo "deploy_frontend=false" >> "$GITHUB_OUTPUT"
+            echo "deploy_backend=true" >> "$GITHUB_OUTPUT"
+          elif [ "$TARGET" = "all" ]; then
+            echo "deploy_frontend=true" >> "$GITHUB_OUTPUT"
+            echo "deploy_backend=true" >> "$GITHUB_OUTPUT"
+          else
+            # Automatic detection using nx affected
+            AFFECTED=$(npx nx show projects --affected --base=HEAD~1 --head=HEAD || echo "")
+            echo "Affected projects: $AFFECTED"
+
+            if echo "$AFFECTED" | grep -q "client"; then
+              echo "deploy_frontend=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "deploy_frontend=false" >> "$GITHUB_OUTPUT"
+            fi
+
+            if echo "$AFFECTED" | grep -q "server"; then
+              echo "deploy_backend=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "deploy_backend=false" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+  deploy-frontend:
+    name: Deploy Frontend to Vercel
+    needs: detect
+    if: ${{ needs.detect.outputs.deploy_frontend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        working-directory: apps/client
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Build Project Artifacts
+        working-directory: apps/client
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Deploy Project Artifacts to Vercel
+        working-directory: apps/client
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+  deploy-backend:
+    name: Deploy Backend to AWS EC2
+    needs: detect
+    if: ${{ needs.detect.outputs.deploy_backend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2.pem
+          chmod 600 ~/.ssh/ec2.pem
+
+      - name: Sync server files to EC2
+        run: |
+          rsync -avz --delete \
+            --exclude 'node_modules' \
+            --exclude '.git' \
+            --exclude 'dist' \
+            --exclude 'build' \
+            --exclude '.gradle' \
+            -e "ssh -i ~/.ssh/ec2.pem -o StrictHostKeyChecking=no" \
+            apps/server/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/server/
+
+      - name: Rebuild and restart server container
+        run: |
+          ssh -i ~/.ssh/ec2.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+            "cd ~/server && docker compose up -d --build"
